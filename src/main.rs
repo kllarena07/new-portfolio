@@ -60,9 +60,10 @@ impl App {
         let outer_layout = Layout::default()
             .direction(Direction::Horizontal)
             .constraints(vec![
+                // must add up to 100
                 Constraint::Max(17),
-                Constraint::Percentage(60),
-                Constraint::Min(23),
+                Constraint::Percentage(57),
+                Constraint::Min(26),
             ])
             .split(portfolio_area);
 
