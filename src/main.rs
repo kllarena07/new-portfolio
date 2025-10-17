@@ -71,7 +71,7 @@ impl App {
             .constraints(vec![Constraint::Max(6)])
             .split(outer_layout[0]);
 
-        let unselected_items: Vec<ListItem> = vec![
+        let unselected_items: [ListItem; 4] = [
             ListItem::new(
                 Span::styled("about", Style::default().fg(Color::DarkGray))
                     .into_right_aligned_line(),
@@ -89,7 +89,7 @@ impl App {
                     .into_right_aligned_line(),
             ),
         ];
-        let selected_items: Vec<ListItem> = vec![
+        let selected_items: [ListItem; 4] = [
             ListItem::new(
                 Span::styled("[ about ]", Style::default().fg(Color::White).bold())
                     .into_right_aligned_line(),
@@ -109,24 +109,20 @@ impl App {
         ];
         // items[0].width()
 
-        let selected: Vec<ListItem> = selected_items
+        let menu_items: Vec<ListItem> = unselected_items
             .iter()
             .enumerate()
-            .filter(|&(i, _)| i == self.selected_page)
-            .map(|(_, item)| item.clone())
+            .map(|(index, item)| {
+                if index == self.selected_page {
+                    selected_items[index].clone()
+                } else {
+                    item.clone()
+                }
+            })
             .collect();
-
-        let unselected: Vec<ListItem> = unselected_items
-            .iter()
-            .enumerate()
-            .filter(|&(i, _)| i != self.selected_page)
-            .map(|(_, item)| item.clone())
-            .collect();
-
-        let combined_items = [selected.clone(), unselected.clone()].concat();
 
         frame.render_widget(
-            List::new(combined_items).block(
+            List::new(menu_items).block(
                 Block::new()
                     .borders(Borders::RIGHT)
                     .border_set(symbols::border::ONE_EIGHTH_TALL)
