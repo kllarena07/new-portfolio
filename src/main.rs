@@ -46,9 +46,9 @@ fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
     for frame_path in frame_files {
         if let Ok(img) = ImageReader::open(&frame_path) {
             if let Ok(decoded_img) = img.decode() {
-                // Resize to maintain aspect ratio
+                // Resize to square dimensions
                 let resized_img =
-                    decoded_img.resize(200, 112, image::imageops::FilterType::Lanczos3);
+                    decoded_img.resize(112, 112, image::imageops::FilterType::Lanczos3);
                 let rgb_img = resized_img.to_rgb8();
                 let (width, height) = rgb_img.dimensions();
 
@@ -278,14 +278,14 @@ impl App {
 
         let canvas = Canvas::default()
             .marker(ratatui::symbols::Marker::HalfBlock)
-            .x_bounds([0.0, 100.0])
-            .y_bounds([0.0, 100.0])
+            .x_bounds([0.0, 112.0])
+            .y_bounds([0.0, 112.0])
             .paint(|ctx| {
                 // Draw pixels from the current frame
                 for (y, row) in current_frame.iter().enumerate() {
                     for (x, pixel) in row.iter().enumerate() {
-                        let canvas_x = x as f64 * 0.5;
-                        let canvas_y = (99_usize.saturating_sub(y)) as f64;
+                        let canvas_x = x as f64;
+                        let canvas_y = (111_usize.saturating_sub(y)) as f64;
 
                         ctx.draw(&Points {
                             coords: &[(canvas_x, canvas_y)],
