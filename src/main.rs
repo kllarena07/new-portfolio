@@ -209,6 +209,49 @@ impl App {
         //     menu[0],
         // );
 
+        let canvas = Canvas::default()
+            .marker(ratatui::symbols::Marker::HalfBlock)
+            .x_bounds([0.0, 112.0])
+            .y_bounds([0.0, 112.0])
+            .paint(|ctx| {
+                // Draw pixels from the current frame
+                for (y, row) in current_frame.iter().enumerate() {
+                    for (x, pixel) in row.iter().enumerate() {
+                        let canvas_x = x as f64;
+                        let canvas_y = (111_usize.saturating_sub(y)) as f64;
+
+                        ctx.draw(&Points {
+                            coords: &[(canvas_x, canvas_y)],
+                            color: ratatui::style::Color::Rgb(pixel[0], pixel[1], pixel[2]),
+                        });
+                    }
+                }
+            });
+        frame.render_widget(canvas, outer_layout[2]);
+    }
+
+    fn handle_key_event(&mut self, key_event: crossterm::event::KeyEvent) -> io::Result<()> {
+        match key_event.code {
+            KeyCode::Char('q') => {
+                self.running = false;
+            }
+            KeyCode::Up => {
+                if self.selected_page > 0 {
+                    self.selected_page -= 1;
+                }
+            }
+            KeyCode::Down => {
+                if self.selected_page < 3 {
+                    self.selected_page += 1;
+                }
+            }
+            _ => {}
+        }
+
+        Ok(())
+    }
+
+    fn build_about_page(&self) -> Paragraph {
         let line_1 = Line::from(vec![
             Span::styled(
                 "hey! my name is ",
@@ -268,66 +311,22 @@ impl App {
             ),
         ]);
 
-        frame.render_widget(
-            Paragraph::new(vec![
-                line_1,
-                Line::from(""),
-                line_2,
-                Line::from(""),
-                line_3,
-                Line::from(""),
-                line_4,
-            ])
-            .block(Block::new().padding(Padding {
-                left: 1,
-                right: 1,
-                top: 0,
-                bottom: 0,
-            }))
-            .wrap(Wrap { trim: true }),
-            outer_layout[1],
-        );
-
-        let canvas = Canvas::default()
-            .marker(ratatui::symbols::Marker::HalfBlock)
-            .x_bounds([0.0, 112.0])
-            .y_bounds([0.0, 112.0])
-            .paint(|ctx| {
-                // Draw pixels from the current frame
-                for (y, row) in current_frame.iter().enumerate() {
-                    for (x, pixel) in row.iter().enumerate() {
-                        let canvas_x = x as f64;
-                        let canvas_y = (111_usize.saturating_sub(y)) as f64;
-
-                        ctx.draw(&Points {
-                            coords: &[(canvas_x, canvas_y)],
-                            color: ratatui::style::Color::Rgb(pixel[0], pixel[1], pixel[2]),
-                        });
-                    }
-                }
-            });
-        frame.render_widget(canvas, outer_layout[2]);
-    }
-
-    fn handle_key_event(&mut self, key_event: crossterm::event::KeyEvent) -> io::Result<()> {
-        match key_event.code {
-            KeyCode::Char('q') => {
-                self.running = false;
-            }
-            KeyCode::Up => {
-                if self.selected_page > 0 {
-                    self.selected_page -= 1;
-                }
-            }
-            KeyCode::Down => {
-                if self.selected_page < 3 {
-                    self.selected_page += 1;
-                }
-            }
-            _ => {}
-        }
-
-        Ok(())
+        Paragraph::new(vec![
+            line_1,
+            Line::from(""),
+            line_2,
+            Line::from(""),
+            line_3,
+            Line::from(""),
+            line_4,
+        ])
+        .block(Block::new().padding(Padding {
+            left: 1,
+            right: 1,
+            top: 0,
+            bottom: 0,
+        }))
+        .wrap(Wrap { trim: true })
     }
 
     fn build_menu_widget(&self) -> List {
