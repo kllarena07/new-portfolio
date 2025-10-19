@@ -199,76 +199,15 @@ impl App {
             ])
             .split(portfolio_area);
 
-        let menu = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints(vec![Constraint::Max(6)])
-            .split(outer_layout[0]);
+        // let menu = Layout::default()
+        //     .direction(Direction::Vertical)
+        //     .constraints(vec![Constraint::Max(6)])
+        //     .split(outer_layout[0]);
 
-        let unselected_items: [ListItem; 4] = [
-            ListItem::new(
-                Span::styled("about", Style::default().fg(Color::DarkGray))
-                    .into_right_aligned_line(),
-            ),
-            ListItem::new(
-                Span::styled("experience", Style::default().fg(Color::DarkGray))
-                    .into_right_aligned_line(),
-            ),
-            ListItem::new(
-                Span::styled("projects", Style::default().fg(Color::DarkGray))
-                    .into_right_aligned_line(),
-            ),
-            ListItem::new(
-                Span::styled("leadership", Style::default().fg(Color::DarkGray))
-                    .into_right_aligned_line(),
-            ),
-        ];
-        let selected_items: [ListItem; 4] = [
-            ListItem::new(
-                Span::styled("[ about ]", Style::default().fg(Color::White).bold())
-                    .into_right_aligned_line(),
-            ),
-            ListItem::new(
-                Span::styled("[ experience ]", Style::default().fg(Color::White).bold())
-                    .into_right_aligned_line(),
-            ),
-            ListItem::new(
-                Span::styled("[ projects ]", Style::default().fg(Color::White).bold())
-                    .into_right_aligned_line(),
-            ),
-            ListItem::new(
-                Span::styled("[ leadership ]", Style::default().fg(Color::White).bold())
-                    .into_right_aligned_line(),
-            ),
-        ];
-        // items[0].width()
+        // frame.render_widget(
 
-        let menu_items: Vec<ListItem> = unselected_items
-            .iter()
-            .enumerate()
-            .map(|(index, item)| {
-                if index == self.selected_page {
-                    selected_items[index].clone()
-                } else {
-                    item.clone()
-                }
-            })
-            .collect();
-
-        frame.render_widget(
-            List::new(menu_items).block(
-                Block::new()
-                    .borders(Borders::RIGHT)
-                    .border_set(symbols::border::ONE_EIGHTH_TALL)
-                    .border_style(Style::new().fg(Color::DarkGray))
-                    .padding(Padding {
-                        top: 1,
-                        bottom: 0,
-                        right: 2,
-                        left: 0,
-                    }),
-            ),
-            menu[0],
-        );
+        //     menu[0],
+        // );
 
         let line_1 = Line::from(vec![
             Span::styled(
@@ -389,5 +328,49 @@ impl App {
         }
 
         Ok(())
+    }
+
+    fn build_menu_widget(&self) -> List {
+        let pages: [String; 4] = [
+            String::from("about"),
+            String::from("experience"),
+            String::from("projects"),
+            String::from("leadership"),
+        ];
+
+        let menu_items: Vec<ListItem> = (0..pages.len())
+            .map(move |index| {
+                let item_content = match index == self.selected_page {
+                    true => format!("[ {} ]", pages[index]),
+                    false => pages[index].to_owned(),
+                };
+
+                let span = match index == self.selected_page {
+                    true => {
+                        Span::styled(item_content, Style::default().fg(Color::Rgb(255, 255, 255)))
+                    }
+                    false => {
+                        Span::styled(item_content, Style::default().fg(Color::Rgb(147, 147, 147)))
+                    }
+                };
+
+                ListItem::new(span.bold().into_right_aligned_line())
+            })
+            .collect();
+
+        let final_list = List::new(menu_items).block(
+            Block::new()
+                .borders(Borders::RIGHT)
+                .border_set(symbols::border::ONE_EIGHTH_TALL)
+                .border_style(Style::new().fg(Color::DarkGray))
+                .padding(Padding {
+                    top: 1,
+                    bottom: 0,
+                    right: 2,
+                    left: 0,
+                }),
+        );
+
+        final_list
     }
 }
