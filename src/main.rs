@@ -339,6 +339,12 @@ impl App {
                 Line::from(""),
                 line_4,
             ])
+            .block(Block::new().padding(Padding {
+                left: 1,
+                right: 1,
+                top: 0,
+                bottom: 0,
+            }))
             .wrap(Wrap { trim: true }),
             outer_layout[1],
         );
