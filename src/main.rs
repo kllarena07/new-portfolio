@@ -1,3 +1,77 @@
+use image::ImageReader;
+use std::fs;
+
+fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
+    let mut all_frames = Vec::new();
+
+    // Read all frame files from hikari directory
+    let mut frame_files = Vec::new();
+    if let Ok(entries) = fs::read_dir("./hikari-dance") {
+        for entry in entries {
+            if let Ok(entry) = entry {
+                let path = entry.path();
+                if let Some(extension) = path.extension() {
+                    if extension == "png" || extension == "jpg" || extension == "jpeg" {
+                        if let Some(_file_name) = path.file_name() {
+                            frame_files.push(path.clone());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Sort the files numerically by extracting frame numbers
+    frame_files.sort_by(|a, b| {
+        let extract_frame_number = |path: &std::path::PathBuf| -> i32 {
+            path.file_stem()
+                .and_then(|stem| stem.to_str())
+                .and_then(|name| name.strip_prefix("frame_"))
+                .and_then(|num_str| num_str.parse::<i32>().ok())
+                .unwrap_or(0)
+        };
+
+        let a_num = extract_frame_number(a);
+        let b_num = extract_frame_number(b);
+        a_num.cmp(&b_num)
+    });
+
+    // Debug: Print first few frame names to verify ordering
+    println!("Frame loading order (first 10):");
+    for (i, path) in frame_files.iter().take(10).enumerate() {
+        println!("{}: {}", i, path.file_name().unwrap().to_string_lossy());
+    }
+
+    // Process each frame
+    for frame_path in frame_files {
+        if let Ok(img) = ImageReader::open(&frame_path) {
+            if let Ok(decoded_img) = img.decode() {
+                // Resize to maintain aspect ratio
+                let resized_img =
+                    decoded_img.resize(200, 112, image::imageops::FilterType::Lanczos3);
+                let rgb_img = resized_img.to_rgb8();
+                let (width, height) = rgb_img.dimensions();
+
+                // Create 2D array to store RGB values for this frame
+                let mut pixel_rgb_val_map: Vec<Vec<[u8; 3]>> = Vec::with_capacity(height as usize);
+
+                for y in 0..height {
+                    let mut row: Vec<[u8; 3]> = Vec::with_capacity(width as usize);
+                    for x in 0..width {
+                        let pixel = rgb_img.get_pixel(x, y);
+                        row.push([pixel[0], pixel[1], pixel[2]]);
+                    }
+                    pixel_rgb_val_map.push(row);
+                }
+
+                all_frames.push(pixel_rgb_val_map);
+            }
+        }
+    }
+
+    all_frames
+}
+
 use crossterm::event::KeyCode;
 use ratatui::{
     DefaultTerminal, Frame,
@@ -5,35 +79,86 @@ use ratatui::{
     style::{Color, Style, Stylize},
     symbols,
     text::Span,
-    widgets::{Block, Borders, List, ListItem, Padding},
+    widgets::{
+        Block, Borders, List, ListItem, Padding,
+        canvas::{Canvas, Points},
+    },
 };
-use std::io;
+use std::{io, sync::mpsc, thread, time::Duration};
 
 fn main() -> io::Result<()> {
-    let mut terminal = ratatui::init();
+    let all_frames = get_all_frames_rgb_vals();
+    let max_frames = all_frames.len();
 
     let mut app = App {
-        selected_page: 0,
         running: true,
+        selected_page: 0,
+        count: 0,
+        all_frames,
+        max_frames,
     };
 
-    let app_result = app.run(&mut terminal);
+    let mut terminal = ratatui::init();
+
+    let (event_tx, event_rx) = mpsc::channel::<Event>();
+
+    let tx_to_input_events = event_tx.clone();
+    thread::spawn(move || {
+        handle_input_events(tx_to_input_events);
+    });
+
+    let tx_to_counter_events = event_tx.clone();
+    let max_frames_for_thread = max_frames;
+    thread::spawn(move || {
+        run_background_thread(tx_to_counter_events, max_frames_for_thread);
+    });
+
+    let app_result = app.run(&mut terminal, event_rx);
 
     ratatui::restore();
     app_result
 }
 
-pub struct App {
-    selected_page: usize,
+enum Event {
+    Input(crossterm::event::KeyEvent),
+    Counter(usize),
+}
+
+fn handle_input_events(tx: mpsc::Sender<Event>) {
+    loop {
+        match crossterm::event::read().unwrap() {
+            crossterm::event::Event::Key(key_event) => tx.send(Event::Input(key_event)).unwrap(),
+            _ => {}
+        }
+    }
+}
+
+fn run_background_thread(tx: mpsc::Sender<Event>, max_frames: usize) {
+    let framerate = 30;
+    let frame_duration = Duration::from_millis(1000 / framerate);
+
+    loop {
+        for count in 0..max_frames {
+            tx.send(Event::Counter(count)).unwrap();
+            thread::sleep(frame_duration);
+        }
+    }
+}
+
+struct App {
     running: bool,
+    selected_page: usize,
+    count: usize,
+    all_frames: Vec<Vec<Vec<[u8; 3]>>>,
+    max_frames: usize,
 }
 
 impl App {
-    fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
+    fn run(&mut self, terminal: &mut DefaultTerminal, rx: mpsc::Receiver<Event>) -> io::Result<()> {
         while self.running {
-            match crossterm::event::read()? {
-                crossterm::event::Event::Key(key_event) => self.handle_key_event(key_event)?,
-                _ => {}
+            match rx.recv().unwrap() {
+                Event::Input(key_event) => self.handle_key_event(key_event)?,
+                Event::Counter(count) => self.count = count,
             }
 
             terminal.draw(|frame| self.draw(frame))?;
@@ -42,7 +167,15 @@ impl App {
         Ok(())
     }
 
-    fn draw(&self, frame: &mut Frame) {
+    fn draw(&mut self, frame: &mut Frame) {
+        if self.all_frames.is_empty() {
+            return;
+        }
+
+        // Get the current frame based on the counter
+        let current_frame_index = self.count % self.max_frames;
+        let current_frame = &self.all_frames[current_frame_index];
+
         fn center(area: Rect, horizontal: Constraint, vertical: Constraint) -> Rect {
             let [area] = Layout::horizontal([horizontal])
                 .flex(Flex::Center)
@@ -142,11 +275,26 @@ impl App {
             // Block::new(),
             outer_layout[1],
         );
-        frame.render_widget(
-            Block::new().bold().fg(Color::Blue).borders(Borders::ALL),
-            // Block::new(),
-            outer_layout[2],
-        );
+
+        let canvas = Canvas::default()
+            .marker(ratatui::symbols::Marker::HalfBlock)
+            .x_bounds([0.0, 100.0])
+            .y_bounds([0.0, 100.0])
+            .paint(|ctx| {
+                // Draw pixels from the current frame
+                for (y, row) in current_frame.iter().enumerate() {
+                    for (x, pixel) in row.iter().enumerate() {
+                        let canvas_x = x as f64 * 0.5;
+                        let canvas_y = (99_usize.saturating_sub(y)) as f64;
+
+                        ctx.draw(&Points {
+                            coords: &[(canvas_x, canvas_y)],
+                            color: ratatui::style::Color::Rgb(pixel[0], pixel[1], pixel[2]),
+                        });
+                    }
+                }
+            });
+        frame.render_widget(canvas, outer_layout[2]);
     }
 
     fn handle_key_event(&mut self, key_event: crossterm::event::KeyEvent) -> io::Result<()> {
