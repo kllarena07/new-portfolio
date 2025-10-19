@@ -78,9 +78,9 @@ use ratatui::{
     layout::{Constraint, Direction, Flex, Layout, Rect},
     style::{Color, Style, Stylize},
     symbols,
-    text::Span,
+    text::{Line, Span},
     widgets::{
-        Block, Borders, List, ListItem, Padding,
+        Block, Borders, List, ListItem, Padding, Paragraph, Wrap,
         canvas::{Canvas, Points},
     },
 };
@@ -270,9 +270,77 @@ impl App {
             ),
             menu[0],
         );
+
+        let line_1 = Line::from(vec![
+            Span::styled(
+                "hey! my name is ",
+                Style::default().fg(Color::Rgb(147, 147, 147)),
+            ),
+            Span::styled(
+                "kieran llarena",
+                Style::default().fg(Color::Rgb(255, 255, 255)),
+            ),
+        ]);
+
+        let line_2 = Line::from(vec![
+            Span::styled(
+                "im currently studying ",
+                Style::default().fg(Color::Rgb(147, 147, 147)),
+            ),
+            Span::styled(
+                "computer science ",
+                Style::default().fg(Color::Rgb(255, 255, 255)),
+            ),
+            Span::styled("at the ", Style::default().fg(Color::Rgb(147, 147, 147))),
+            Span::styled(
+                "university of michigan-dearborn",
+                Style::default().fg(Color::Rgb(255, 255, 255)),
+            ),
+            Span::styled(
+                ". my expected graduation date is ",
+                Style::default().fg(Color::Rgb(147, 147, 147)),
+            ),
+            Span::styled("may 2027", Style::default().fg(Color::Rgb(255, 255, 255))),
+        ]);
+
+        let line_3 = Line::from(vec![
+            Span::styled(
+                "interested in working on teams that value ",
+                Style::default().fg(Color::Rgb(147, 147, 147)),
+            ),
+            Span::styled(
+                "high velocity ",
+                Style::default().fg(Color::Rgb(255, 255, 255)),
+            ),
+            Span::styled("and ", Style::default().fg(Color::Rgb(147, 147, 147))),
+            Span::styled(
+                "strong ownership",
+                Style::default().fg(Color::Rgb(255, 255, 255)),
+            ),
+        ]);
+
+        let line_4 = Line::from(vec![
+            Span::styled(
+                "i have extensive experience in fullstack development, both in web and mobile. i particularly enjoy ",
+                Style::default().fg(Color::Rgb(147, 147, 147)),
+            ),
+            Span::styled(
+                "designing infrastructure that scales reliably and cost-effectively",
+                Style::default().fg(Color::Rgb(255, 255, 255)),
+            ),
+        ]);
+
         frame.render_widget(
-            Block::new().bold().fg(Color::Green).borders(Borders::ALL),
-            // Block::new(),
+            Paragraph::new(vec![
+                line_1,
+                Line::from(""),
+                line_2,
+                Line::from(""),
+                line_3,
+                Line::from(""),
+                line_4,
+            ])
+            .wrap(Wrap { trim: true }),
             outer_layout[1],
         );
 
