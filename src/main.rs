@@ -53,7 +53,7 @@ impl App {
 
         let portfolio_area = center(
             frame.area(),
-            Constraint::Length(110),
+            Constraint::Length(150),
             Constraint::Length(25),
         );
 
