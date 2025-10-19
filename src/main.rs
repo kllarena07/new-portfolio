@@ -1,5 +1,18 @@
+use crossterm::event::KeyCode;
 use image::ImageReader;
+use ratatui::{
+    DefaultTerminal, Frame,
+    layout::{Constraint, Direction, Flex, Layout, Rect},
+    style::{Color, Style, Stylize},
+    symbols,
+    text::{Line, Span},
+    widgets::{
+        Block, Borders, List, ListItem, Padding, Paragraph, Wrap,
+        canvas::{Canvas, Points},
+    },
+};
 use std::fs;
+use std::{io, sync::mpsc, thread, time::Duration};
 
 fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
     let mut all_frames = Vec::new();
@@ -71,20 +84,6 @@ fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
 
     all_frames
 }
-
-use crossterm::event::KeyCode;
-use ratatui::{
-    DefaultTerminal, Frame,
-    layout::{Constraint, Direction, Flex, Layout, Rect},
-    style::{Color, Style, Stylize},
-    symbols,
-    text::{Line, Span},
-    widgets::{
-        Block, Borders, List, ListItem, Padding, Paragraph, Wrap,
-        canvas::{Canvas, Points},
-    },
-};
-use std::{io, sync::mpsc, thread, time::Duration};
 
 fn main() -> io::Result<()> {
     let all_frames = get_all_frames_rgb_vals();
