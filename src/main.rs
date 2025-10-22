@@ -120,11 +120,12 @@ fn main() -> io::Result<()> {
         running: true,
         selected_page: 0,
         count: 0,
-        links,
+        links: links.clone(),
         pages,
         all_frames,
         max_frames,
         about_page_state: 0,
+        current_link: links[0].link.clone(),
     };
 
     let mut terminal = ratatui::init();
@@ -174,6 +175,7 @@ fn run_background_thread(tx: mpsc::Sender<Event>, max_frames: usize) {
     }
 }
 
+#[derive(Clone)]
 struct ContactLink {
     display_text: String,
     link: String,
@@ -188,6 +190,7 @@ struct App<'a> {
     all_frames: Vec<Vec<Vec<[u8; 3]>>>,
     max_frames: usize,
     about_page_state: usize,
+    current_link: String,
 }
 
 impl<'a> App<'a> {
@@ -282,6 +285,9 @@ impl<'a> App<'a> {
 
     fn next_page(&mut self) {
         if self.selected_page + 1 < self.pages.len() {
+            if self.selected_page == 0 {
+                self.current_link = String::from("");
+            }
             self.selected_page += 1;
         }
     }
@@ -293,6 +299,7 @@ impl<'a> App<'a> {
 
         if self.about_page_state > 0 {
             self.about_page_state -= 1;
+            self.current_link = self.links[self.about_page_state].link.to_owned();
         }
     }
 
@@ -303,6 +310,13 @@ impl<'a> App<'a> {
 
         if self.about_page_state < self.links.len() - 1 {
             self.about_page_state += 1;
+            self.current_link = self.links[self.about_page_state].link.to_owned();
+        }
+    }
+
+    fn open_current_link(&mut self) {
+        if !&self.current_link.is_empty() {
+            open::that(&self.current_link).unwrap();
         }
     }
 
@@ -315,6 +329,7 @@ impl<'a> App<'a> {
             KeyCode::Right => self.next_link(),
             KeyCode::Up => self.previous_page(),
             KeyCode::Down => self.next_page(),
+            KeyCode::Enter => self.open_current_link(),
             _ => {}
         }
 
