@@ -15,6 +15,7 @@ use std::fs;
 use std::{io, sync::mpsc, thread, time::Duration};
 
 fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
+    const LIMIT_TO_10_FRAMES: bool = true; // Set to true to only load first 10 frames
     let mut all_frames = Vec::new();
 
     // Read all frame files from hikari directory
@@ -56,7 +57,13 @@ fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
     }
 
     // Process each frame
-    for frame_path in frame_files {
+    let frames_to_process = if LIMIT_TO_10_FRAMES {
+        frame_files.into_iter().take(10).collect()
+    } else {
+        frame_files
+    };
+
+    for frame_path in frames_to_process {
         if let Ok(img) = ImageReader::open(&frame_path) {
             if let Ok(decoded_img) = img.decode() {
                 // Resize to square dimensions
@@ -88,13 +95,36 @@ fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
 fn main() -> io::Result<()> {
     let all_frames = get_all_frames_rgb_vals();
     let max_frames = all_frames.len();
+    let pages = vec!["about", "experience", "projects", "leadership"];
+
+    let links: Vec<ContactLink> = vec![
+        ContactLink {
+            display_text: String::from("twitter"),
+            link: String::from("https://x.com/krayondev"),
+        },
+        ContactLink {
+            display_text: String::from("linkedin"),
+            link: String::from("https://www.linkedin.com/in/kllarena07/"),
+        },
+        ContactLink {
+            display_text: String::from("github"),
+            link: String::from("https://github.com/kllarena07"),
+        },
+        ContactLink {
+            display_text: String::from("email"),
+            link: String::from("mailto:kieran.llarena@gmail.com"),
+        },
+    ];
 
     let mut app = App {
         running: true,
         selected_page: 0,
         count: 0,
+        links,
+        pages,
         all_frames,
         max_frames,
+        about_page_state: 0,
     };
 
     let mut terminal = ratatui::init();
@@ -144,15 +174,23 @@ fn run_background_thread(tx: mpsc::Sender<Event>, max_frames: usize) {
     }
 }
 
-struct App {
+struct ContactLink {
+    display_text: String,
+    link: String,
+}
+
+struct App<'a> {
     running: bool,
     selected_page: usize,
     count: usize,
+    links: Vec<ContactLink>,
+    pages: Vec<&'a str>,
     all_frames: Vec<Vec<Vec<[u8; 3]>>>,
     max_frames: usize,
+    about_page_state: usize,
 }
 
-impl App {
+impl<'a> App<'a> {
     fn run(&mut self, terminal: &mut DefaultTerminal, rx: mpsc::Receiver<Event>) -> io::Result<()> {
         while self.running {
             match rx.recv().unwrap() {
@@ -175,40 +213,41 @@ impl App {
         let current_frame_index = self.count % self.max_frames;
         let current_frame = &self.all_frames[current_frame_index];
 
-        fn center(area: Rect, horizontal: Constraint, vertical: Constraint) -> Rect {
-            let [area] = Layout::horizontal([horizontal])
-                .flex(Flex::Center)
-                .areas(area);
-            let [area] = Layout::vertical([vertical]).flex(Flex::Center).areas(area);
-            area
-        }
-
-        let portfolio_area = center(
-            frame.area(),
-            Constraint::Length(150),
-            Constraint::Length(25),
-        );
-
-        let outer_layout = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints(vec![
-                // must add up to 100
-                Constraint::Max(17),
-                Constraint::Percentage(57),
-                Constraint::Min(26),
-            ])
-            .split(portfolio_area);
-
-        // let menu = Layout::default()
-        //     .direction(Direction::Vertical)
-        //     .constraints(vec![Constraint::Max(6)])
-        //     .split(outer_layout[0]);
+        let [vertical_area] = Layout::vertical([Constraint::Percentage(75)])
+            .flex(Flex::Center)
+            .areas(frame.area());
+        let [left_area, center_area, right_area] = Layout::horizontal([
+            Constraint::Max(20),
+            Constraint::Max(90),
+            Constraint::Max(50),
+        ])
+        .flex(Flex::Center)
+        .areas(vertical_area);
 
         // frame.render_widget(
-
-        //     menu[0],
+        //     Block::new()
+        //         .fg(Color::Red)
+        //         .title("Left")
+        //         .borders(Borders::ALL),
+        //     left_area,
+        // );
+        // frame.render_widget(
+        //     Block::new()
+        //         .fg(Color::Green)
+        //         .title("Center")
+        //         .borders(Borders::ALL),
+        //     center_area,
+        // );
+        // frame.render_widget(
+        //     Block::new()
+        //         .fg(Color::Blue)
+        //         .title("Right")
+        //         .borders(Borders::ALL),
+        //     right_area,
         // );
 
+        let menu_widget = self.build_menu_widget();
+        let about_page: Paragraph = self.build_about_page();
         let canvas = Canvas::default()
             .marker(ratatui::symbols::Marker::HalfBlock)
             .x_bounds([0.0, 112.0])
@@ -227,7 +266,22 @@ impl App {
                     }
                 }
             });
-        frame.render_widget(canvas, outer_layout[2]);
+
+        frame.render_widget(menu_widget, left_area);
+        frame.render_widget(about_page, center_area);
+        frame.render_widget(canvas, right_area);
+    }
+
+    fn previous_page(&mut self) {
+        if self.selected_page > 0 {
+            self.selected_page -= 1;
+        }
+    }
+
+    fn next_page(&mut self) {
+        if self.selected_page + 1 < self.pages.len() {
+            self.selected_page += 1;
+        }
     }
 
     fn handle_key_event(&mut self, key_event: crossterm::event::KeyEvent) -> io::Result<()> {
@@ -235,23 +289,33 @@ impl App {
             KeyCode::Char('q') => {
                 self.running = false;
             }
-            KeyCode::Up => {
-                if self.selected_page > 0 {
-                    self.selected_page -= 1;
+            KeyCode::Left => {
+                if self.selected_page != 0 {
+                    return Ok(());
+                }
+
+                if self.about_page_state > 0 {
+                    self.about_page_state -= 2;
                 }
             }
-            KeyCode::Down => {
-                if self.selected_page < 3 {
-                    self.selected_page += 1;
+            KeyCode::Right => {
+                if self.selected_page != 0 {
+                    return Ok(());
+                }
+
+                if self.about_page_state + 2 < self.links.len() {
+                    self.about_page_state += 2;
                 }
             }
+            KeyCode::Up => self.previous_page(),
+            KeyCode::Down => self.next_page(),
             _ => {}
         }
 
         Ok(())
     }
 
-    fn build_about_page(&self) -> Paragraph {
+    fn build_about_page(&self) -> Paragraph<'_> {
         let line_1 = Line::from(vec![
             Span::styled(
                 "hey! my name is ",
@@ -311,6 +375,26 @@ impl App {
             ),
         ]);
 
+        let line_items: Vec<Span> = (0..self.links.len() * 2)
+            .map(move |index| {
+                if (index + 1) % 2 == 0 && index + 1 < self.links.len() * 2 {
+                    return Span::styled(" - ", Style::default().fg(Color::Rgb(147, 147, 147)));
+                }
+
+                let style_config = match index == self.about_page_state {
+                    true => Style::default().fg(Color::Rgb(0, 255, 251)).underlined(),
+                    false => Style::default().fg(Color::Rgb(147, 147, 147)),
+                };
+
+                let display_text = self.links[index / 2].display_text.to_owned();
+                let _link = self.links[index / 2].link.to_owned();
+
+                Span::styled(display_text, style_config)
+            })
+            .collect();
+
+        let links_line = Line::from(line_items);
+
         Paragraph::new(vec![
             line_1,
             Line::from(""),
@@ -319,6 +403,8 @@ impl App {
             line_3,
             Line::from(""),
             line_4,
+            Line::from(""),
+            links_line,
         ])
         .block(Block::new().padding(Padding {
             left: 1,
@@ -329,19 +415,12 @@ impl App {
         .wrap(Wrap { trim: true })
     }
 
-    fn build_menu_widget(&self) -> List {
-        let pages: [String; 4] = [
-            String::from("about"),
-            String::from("experience"),
-            String::from("projects"),
-            String::from("leadership"),
-        ];
-
-        let menu_items: Vec<ListItem> = (0..pages.len())
+    fn build_menu_widget(&self) -> List<'_> {
+        let menu_items: Vec<ListItem> = (0..self.pages.len())
             .map(move |index| {
                 let item_content = match index == self.selected_page {
-                    true => format!("[ {} ]", pages[index]),
-                    false => pages[index].to_owned(),
+                    true => format!("[ {} ]", self.pages[index]),
+                    false => self.pages[index].to_owned(),
                 };
 
                 let span = match index == self.selected_page {
@@ -364,7 +443,7 @@ impl App {
                 .border_style(Style::new().fg(Color::DarkGray))
                 .padding(Padding {
                     top: 1,
-                    bottom: 0,
+                    bottom: 1,
                     right: 2,
                     left: 0,
                 }),
