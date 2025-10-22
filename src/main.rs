@@ -228,6 +228,8 @@ impl<'a> App<'a> {
         .areas(vertical_area);
         let menu_height: u16 = (self.pages.len() + 2) as u16;
         let [menu_area] = Layout::vertical([Constraint::Max(menu_height)]).areas(left_area);
+        let [vcanvas_area] = Layout::vertical([Constraint::Max(15)]).areas(right_area);
+        let [canvas_area] = Layout::horizontal([Constraint::Max(50)]).areas(vcanvas_area);
 
         // frame.render_widget(
         //     Block::new()
@@ -274,7 +276,7 @@ impl<'a> App<'a> {
 
         frame.render_widget(menu_widget, menu_area);
         frame.render_widget(about_page, center_area);
-        frame.render_widget(canvas, right_area);
+        frame.render_widget(canvas, canvas_area);
     }
 
     fn previous_page(&mut self) {
