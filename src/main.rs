@@ -213,7 +213,7 @@ impl<'a> App<'a> {
         let current_frame_index = self.count % self.max_frames;
         let current_frame = &self.all_frames[current_frame_index];
 
-        let [vertical_area] = Layout::vertical([Constraint::Percentage(75)])
+        let [vertical_area] = Layout::vertical([Constraint::Percentage(35)])
             .flex(Flex::Center)
             .areas(frame.area());
         let [left_area, center_area, right_area] = Layout::horizontal([
