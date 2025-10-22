@@ -286,29 +286,33 @@ impl<'a> App<'a> {
         }
     }
 
+    fn previous_link(&mut self) {
+        if self.selected_page != 0 {
+            return;
+        }
+
+        if self.about_page_state > 0 {
+            self.about_page_state -= 1;
+        }
+    }
+
+    fn next_link(&mut self) {
+        if self.selected_page != 0 {
+            return;
+        }
+
+        if self.about_page_state < self.links.len() - 1 {
+            self.about_page_state += 1;
+        }
+    }
+
     fn handle_key_event(&mut self, key_event: crossterm::event::KeyEvent) -> io::Result<()> {
         match key_event.code {
             KeyCode::Char('q') => {
                 self.running = false;
             }
-            KeyCode::Left => {
-                if self.selected_page != 0 {
-                    return Ok(());
-                }
-
-                if self.about_page_state > 0 {
-                    self.about_page_state -= 2;
-                }
-            }
-            KeyCode::Right => {
-                if self.selected_page != 0 {
-                    return Ok(());
-                }
-
-                if self.about_page_state + 2 < self.links.len() {
-                    self.about_page_state += 2;
-                }
-            }
+            KeyCode::Left => self.previous_link(),
+            KeyCode::Right => self.next_link(),
             KeyCode::Up => self.previous_page(),
             KeyCode::Down => self.next_page(),
             _ => {}
@@ -399,13 +403,13 @@ impl<'a> App<'a> {
             ),
         ]);
 
-        let line_items: Vec<Span> = (0..self.links.len() * 2)
+        let line_items: Vec<Span> = (0..(self.links.len() * 2) - 1)
             .map(move |index| {
-                if (index + 1) % 2 == 0 && index + 1 < self.links.len() * 2 {
+                if (index + 1) % 2 == 0 {
                     return Span::styled(" - ", Style::default().fg(Color::Rgb(147, 147, 147)));
                 }
 
-                let style_config = match index == self.about_page_state {
+                let style_config = match index / 2 == self.about_page_state {
                     true => Style::default().fg(Color::Rgb(0, 255, 251)).underlined(),
                     false => Style::default().fg(Color::Rgb(147, 147, 147)),
                 };
