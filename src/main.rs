@@ -359,7 +359,7 @@ impl<'a> App<'a> {
 
         let line_4 = Line::from(vec![
             Span::styled(
-                "im interested in working on teams that value ",
+                "i thrive best in environments that value ",
                 Style::default().fg(Color::Rgb(147, 147, 147)),
             ),
             Span::styled(
@@ -375,7 +375,7 @@ impl<'a> App<'a> {
 
         let line_5 = Line::from(vec![
             Span::styled(
-                "i have an extensive background in ",
+                "my background is rooted in ",
                 Style::default().fg(Color::Rgb(147, 147, 147)),
             ),
             Span::styled(
