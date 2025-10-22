@@ -2,7 +2,7 @@ use crossterm::event::KeyCode;
 use image::ImageReader;
 use ratatui::{
     DefaultTerminal, Frame,
-    layout::{Constraint, Direction, Flex, Layout, Rect},
+    layout::{Constraint, Flex, Layout},
     style::{Color, Style, Stylize},
     symbols,
     text::{Line, Span},
@@ -217,12 +217,14 @@ impl<'a> App<'a> {
             .flex(Flex::Center)
             .areas(frame.area());
         let [left_area, center_area, right_area] = Layout::horizontal([
-            Constraint::Max(20),
-            Constraint::Max(90),
-            Constraint::Max(50),
+            Constraint::Fill(1),
+            Constraint::Max(80),
+            Constraint::Fill(1),
         ])
         .flex(Flex::Center)
         .areas(vertical_area);
+        let menu_height: u16 = (self.pages.len() + 2) as u16;
+        let [menu_area] = Layout::vertical([Constraint::Max(menu_height)]).areas(left_area);
 
         // frame.render_widget(
         //     Block::new()
@@ -267,7 +269,7 @@ impl<'a> App<'a> {
                 }
             });
 
-        frame.render_widget(menu_widget, left_area);
+        frame.render_widget(menu_widget, menu_area);
         frame.render_widget(about_page, center_area);
         frame.render_widget(canvas, right_area);
     }
@@ -341,16 +343,19 @@ impl<'a> App<'a> {
                 "university of michigan-dearborn",
                 Style::default().fg(Color::Rgb(255, 255, 255)),
             ),
+        ]);
+
+        let line_3 = Line::from(vec![
             Span::styled(
-                ". my expected graduation date is ",
+                "my expected graduation date is ",
                 Style::default().fg(Color::Rgb(147, 147, 147)),
             ),
             Span::styled("may 2027", Style::default().fg(Color::Rgb(255, 255, 255))),
         ]);
 
-        let line_3 = Line::from(vec![
+        let line_4 = Line::from(vec![
             Span::styled(
-                "interested in working on teams that value ",
+                "im interested in working on teams that value ",
                 Style::default().fg(Color::Rgb(147, 147, 147)),
             ),
             Span::styled(
@@ -364,13 +369,32 @@ impl<'a> App<'a> {
             ),
         ]);
 
-        let line_4 = Line::from(vec![
+        let line_5 = Line::from(vec![
             Span::styled(
-                "i have extensive experience in fullstack development, both in web and mobile. i particularly enjoy ",
+                "i have an extensive background in ",
                 Style::default().fg(Color::Rgb(147, 147, 147)),
             ),
             Span::styled(
-                "designing infrastructure that scales reliably and cost-effectively",
+                "web and mobile fullstack development",
+                Style::default().fg(Color::Rgb(255, 255, 255)),
+            ),
+        ]);
+
+        let line_6 = Line::from(vec![
+            Span::styled(
+                "im currently exploring ",
+                Style::default().fg(Color::Rgb(147, 147, 147)),
+            ),
+            Span::styled(
+                "systems programming",
+                Style::default().fg(Color::Rgb(255, 255, 255)),
+            ),
+            Span::styled(
+                ", specifically working with ",
+                Style::default().fg(Color::Rgb(147, 147, 147)),
+            ),
+            Span::styled(
+                "embedded Rust on microcontrollers",
                 Style::default().fg(Color::Rgb(255, 255, 255)),
             ),
         ]);
@@ -404,11 +428,15 @@ impl<'a> App<'a> {
             Line::from(""),
             line_4,
             Line::from(""),
+            line_5,
+            Line::from(""),
+            line_6,
+            Line::from(""),
             links_line,
         ])
         .block(Block::new().padding(Padding {
             left: 1,
-            right: 1,
+            right: 2,
             top: 0,
             bottom: 0,
         }))
