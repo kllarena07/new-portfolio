@@ -7,7 +7,7 @@ use ratatui::{
     symbols,
     text::{Line, Span},
     widgets::{
-        Block, Borders, List, ListItem, Padding, Paragraph, Wrap,
+        Block, Borders, Cell, List, ListItem, Padding, Paragraph, Row, Table, Wrap,
         canvas::{Canvas, Points},
     },
 };
@@ -95,6 +95,11 @@ fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
 fn main() -> io::Result<()> {
     let all_frames = get_all_frames_rgb_vals();
     let max_frames = all_frames.len();
+    println!(
+        "width: {}, height: {}",
+        all_frames[0][0].len(),
+        all_frames[0].len()
+    );
     let pages = vec!["about", "experience", "projects", "leadership"];
 
     let links: Vec<ContactLink> = vec![
@@ -116,11 +121,50 @@ fn main() -> io::Result<()> {
         },
     ];
 
+    let experience = vec![
+        Experience {
+            role: String::from("swe intern"),
+            affiliation: String::from("capital one"),
+            time: String::from("(jun 2026-aug 2026)"),
+        },
+        Experience {
+            role: String::from("ceo / cto"),
+            affiliation: String::from("ootd"),
+            time: String::from("(mar 2025-oct 2025)"),
+        },
+        Experience {
+            role: String::from("swe intern"),
+            affiliation: String::from("capital one"),
+            time: String::from("(jun 2025-aug 2025)"),
+        },
+        Experience {
+            role: String::from("mobile app dev"),
+            affiliation: String::from("swe, um-dearborn"),
+            time: String::from("(feb 2025-mar 2025)"),
+        },
+        Experience {
+            role: String::from("frontend dev"),
+            affiliation: String::from("gdsc, um-dearborn"),
+            time: String::from("(nov 2023-dec 2023)"),
+        },
+        Experience {
+            role: String::from("fullstack dev"),
+            affiliation: String::from("adhd magazine"),
+            time: String::from("(may 2023-aug 2023)"),
+        },
+        Experience {
+            role: String::from("swe intern"),
+            affiliation: String::from("ai camp"),
+            time: String::from("(sep 2022-nov 2022)"),
+        },
+    ];
+
     let mut app = App {
         running: true,
         selected_page: 0,
         count: 0,
         links: links.clone(),
+        experience,
         pages,
         all_frames,
         max_frames,
@@ -181,11 +225,24 @@ struct ContactLink {
     link: String,
 }
 
+struct Experience {
+    role: String,
+    affiliation: String,
+    time: String,
+}
+
+impl Experience {
+    const fn ref_array(&self) -> [&String; 3] {
+        [&self.role, &self.affiliation, &self.time]
+    }
+}
+
 struct App<'a> {
     running: bool,
     selected_page: usize,
     count: usize,
     links: Vec<ContactLink>,
+    experience: Vec<Experience>,
     pages: Vec<&'a str>,
     all_frames: Vec<Vec<Vec<[u8; 3]>>>,
     max_frames: usize,
@@ -245,26 +302,55 @@ impl<'a> App<'a> {
         //         .borders(Borders::ALL),
         //     center_area,
         // );
-        // frame.render_widget(
-        //     Block::new()
-        //         .fg(Color::Blue)
-        //         .title("Right")
-        //         .borders(Borders::ALL),
-        //     right_area,
-        // );
+        frame.render_widget(
+            Block::new()
+                .fg(Color::Blue)
+                .title("Right")
+                .borders(Borders::ALL),
+            canvas_area,
+        );
 
         let menu_widget = self.build_menu_widget();
-        let about_page: Paragraph = self.build_about_page();
+        match self.selected_page {
+            0 => {
+                let about_page = self.build_about_page();
+                frame.render_widget(about_page, center_area);
+            }
+            1 => {
+                let experience_page = self.build_experience_page();
+                frame.render_widget(experience_page, center_area);
+            }
+            2 => {
+                let projects_page = self.build_projects_page();
+                frame.render_widget(projects_page, center_area);
+            }
+            3 => {
+                let leadership_page = self.build_leadership_page();
+                frame.render_widget(leadership_page, center_area);
+            }
+            _ => {}
+        }
+
+        // Canvas bounds should match terminal character dimensions
+        // For HalfBlock marker, each terminal cell is 1 wide and 2 tall in canvas coordinates
+        let canvas_width = canvas_area.width as f64;
+        let canvas_height = (canvas_area.height * 2) as f64; // HalfBlock doubles vertical resolution
+
         let canvas = Canvas::default()
             .marker(ratatui::symbols::Marker::HalfBlock)
-            .x_bounds([0.0, 112.0])
-            .y_bounds([0.0, 112.0])
+            .x_bounds([0.0, canvas_width])
+            .y_bounds([0.0, canvas_height])
             .paint(|ctx| {
-                // Draw pixels from the current frame
+                // Stretch the 112x112 frame to fill the entire canvas area
+                let frame_width = 112.0;
+                let frame_height = 112.0;
+
+                // Draw pixels from the current frame, mapping each pixel to fill the canvas
                 for (y, row) in current_frame.iter().enumerate() {
                     for (x, pixel) in row.iter().enumerate() {
-                        let canvas_x = x as f64;
-                        let canvas_y = (111_usize.saturating_sub(y)) as f64;
+                        // Map frame coordinates directly to canvas coordinates
+                        let canvas_x = (x as f64 / frame_width) * canvas_width;
+                        let canvas_y = canvas_height - ((y as f64 / frame_height) * canvas_height);
 
                         ctx.draw(&Points {
                             coords: &[(canvas_x, canvas_y)],
@@ -275,7 +361,6 @@ impl<'a> App<'a> {
             });
 
         frame.render_widget(menu_widget, menu_area);
-        frame.render_widget(about_page, center_area);
         frame.render_widget(canvas, canvas_area);
     }
 
@@ -462,6 +547,49 @@ impl<'a> App<'a> {
             bottom: 0,
         }))
         .wrap(Wrap { trim: true })
+    }
+
+    fn build_experience_page(&self) -> Table<'_> {
+        let header = ["role", "affiliation", "time"]
+            .into_iter()
+            .map(Cell::from)
+            .collect::<Row>()
+            .height(1);
+
+        let rows = self.experience.iter().enumerate().map(|(_, data)| {
+            let item = data.ref_array();
+            item.into_iter()
+                .map(|content| Cell::from(content.as_str()))
+                .collect::<Row>()
+                // .style(Style::new().fg(self.colors.row_fg).bg(color))
+                .height(1)
+        });
+
+        let final_table = Table::new(
+            rows,
+            [
+                Constraint::Fill(1),
+                Constraint::Fill(1),
+                Constraint::Fill(1),
+            ],
+        )
+        .header(header);
+
+        final_table
+    }
+
+    fn build_projects_page(&self) -> Block<'_> {
+        Block::new()
+            .borders(Borders::ALL)
+            .title("Projects")
+            .border_style(Color::Red)
+    }
+
+    fn build_leadership_page(&self) -> Block<'_> {
+        Block::new()
+            .borders(Borders::ALL)
+            .title("Leadership")
+            .border_style(Color::Green)
     }
 
     fn build_menu_widget(&self) -> List<'_> {
