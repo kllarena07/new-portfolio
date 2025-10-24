@@ -153,7 +153,7 @@ fn main() -> io::Result<()> {
             time: String::from("(may 2023-aug 2023)"),
         },
         Experience {
-            role: String::from("swe intern"),
+            role: String::from("incubatee"),
             affiliation: String::from("ai camp"),
             time: String::from("(sep 2022-nov 2022)"),
         },
