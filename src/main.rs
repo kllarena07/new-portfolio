@@ -304,13 +304,13 @@ impl<'a> App<'a> {
         //         .borders(Borders::ALL),
         //     center_area,
         // );
-        frame.render_widget(
-            Block::new()
-                .fg(Color::Blue)
-                .title("Right")
-                .borders(Borders::ALL),
-            canvas_area,
-        );
+        // frame.render_widget(
+        //     Block::new()
+        //         .fg(Color::Blue)
+        //         .title("Right")
+        //         .borders(Borders::ALL),
+        //     canvas_area,
+        // );
 
         let menu_widget = self.build_menu_widget();
         match self.selected_page {
