@@ -169,6 +169,7 @@ fn main() -> io::Result<()> {
         all_frames,
         max_frames,
         about_page_state: 0,
+        experience_page_state: 0,
         current_link: links[0].link.clone(),
     };
 
@@ -241,13 +242,14 @@ struct App<'a> {
     running: bool,
     selected_page: usize,
     count: usize,
+    max_frames: usize,
+    about_page_state: usize,
+    experience_page_state: usize,
+    current_link: String,
     links: Vec<ContactLink>,
     experience: Vec<Experience>,
     pages: Vec<&'a str>,
     all_frames: Vec<Vec<Vec<[u8; 3]>>>,
-    max_frames: usize,
-    about_page_state: usize,
-    current_link: String,
 }
 
 impl<'a> App<'a> {
@@ -401,6 +403,26 @@ impl<'a> App<'a> {
         }
     }
 
+    fn previous_experience(&mut self) {
+        if self.selected_page != 1 {
+            return;
+        }
+
+        if self.experience_page_state > 0 {
+            self.experience_page_state -= 1;
+        }
+    }
+
+    fn next_experience(&mut self) {
+        if self.selected_page != 1 {
+            return;
+        }
+
+        if self.experience_page_state < self.experience.len() - 1 {
+            self.experience_page_state += 1;
+        }
+    }
+
     fn open_current_link(&mut self) {
         if !&self.current_link.is_empty() {
             open::that(&self.current_link).unwrap();
@@ -417,6 +439,8 @@ impl<'a> App<'a> {
             KeyCode::Up => self.previous_page(),
             KeyCode::Down => self.next_page(),
             KeyCode::Enter => self.open_current_link(),
+            KeyCode::Char('k') => self.previous_experience(),
+            KeyCode::Char('j') => self.next_experience(),
             _ => {}
         }
 
@@ -556,12 +580,18 @@ impl<'a> App<'a> {
             .collect::<Row>()
             .height(1);
 
-        let rows = self.experience.iter().enumerate().map(|(_, data)| {
+        let rows = self.experience.iter().enumerate().map(|(i, data)| {
             let item = data.ref_array();
+
+            let style_config = match i == self.experience_page_state {
+                true => Style::new().fg(Color::Rgb(0, 0, 0)).bg(Color::White),
+                false => Style::new().fg(Color::Rgb(147, 147, 147)),
+            };
+
             item.into_iter()
                 .map(|content| Cell::from(content.as_str()))
                 .collect::<Row>()
-                // .style(Style::new().fg(self.colors.row_fg).bg(color))
+                .style(style_config)
                 .height(1)
         });
 
