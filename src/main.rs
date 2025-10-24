@@ -603,7 +603,13 @@ impl<'a> App<'a> {
                 Constraint::Fill(1),
             ],
         )
-        .header(header);
+        .header(header)
+        .block(Block::new().padding(Padding {
+            left: 1,
+            right: 2,
+            top: 0,
+            bottom: 0,
+        }));
 
         final_table
     }
