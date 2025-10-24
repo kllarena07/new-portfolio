@@ -790,7 +790,7 @@ impl<'a> App<'a> {
             Block::new()
                 .borders(Borders::RIGHT)
                 .border_set(symbols::border::ONE_EIGHTH_TALL)
-                .border_style(Style::new().fg(Color::DarkGray))
+                .border_style(Style::new().fg(Color::Rgb(147, 147, 147)))
                 .padding(Padding {
                     top: 1,
                     bottom: 1,
