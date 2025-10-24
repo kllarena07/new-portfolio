@@ -363,7 +363,15 @@ impl<'a> App<'a> {
             });
 
         frame.render_widget(menu_widget, menu_area);
-        frame.render_widget(canvas, canvas_area);
+
+        match self.selected_page {
+            0 => frame.render_widget(canvas, canvas_area),
+            1 => {
+                let description = self.build_experience_description();
+                frame.render_widget(description, canvas_area)
+            }
+            _ => {}
+        };
     }
 
     fn previous_page(&mut self) {
@@ -612,6 +620,135 @@ impl<'a> App<'a> {
         }));
 
         final_table
+    }
+
+    fn build_experience_description(&self) -> Paragraph<'_> {
+        let mut description: Vec<Line<'_>> = match self.experience_page_state {
+            0 => {
+                vec![Line::from(vec![
+                    Span::from("incoming summer 2026 under the tip program")
+                        .fg(Color::Rgb(147, 147, 147)),
+                ])]
+            }
+            1 => {
+                vec![
+                    Line::from(
+                        vec![
+                            Span::from("led a team of 4 to ship an irl dress to impress mobile app with 260+ users")
+                        .fg(Color::Rgb(147, 147, 147))]
+                        ),
+                    Line::from(""),
+                    Line::from(vec![
+                        Span::from("notable highlights:")
+                        .fg(Color::Rgb(147, 147, 147))
+                    ]),
+                    Line::from(vec![
+                        Span::from("- achieved a 3x boost in DAU retention by analyzing user behavior patterns and implementing targeted push notifications").fg(Color::Rgb(147, 147, 147))
+                    ])
+                ]
+            }
+            2 => {
+                vec![
+                    Line::from(
+                        vec![
+                            Span::from("worked on the capital one empath dashboard on a team of 5")
+                        .fg(Color::Rgb(147, 147, 147))
+                        ]
+                        ),
+                    Line::from(""),
+                    Line::from(vec![
+                        Span::from("notable highlights:")
+                        .fg(Color::Rgb(147, 147, 147))
+                    ]),
+                    Line::from(
+                        vec![
+                            Span::from("- created a digital enrollment status badge to help reduce Capital One agent call times by 12%")
+                        .fg(Color::Rgb(147, 147, 147))
+                        ]
+                        )
+                ]
+            }
+            3 => {
+                vec![
+                    Line::from(
+                        vec![
+                            Span::from("solo developed an event management mobile app for the society of women engineers at the university of michigan-dearborn's power conference")
+                        .fg(Color::Rgb(147, 147, 147))]
+                        ),
+                    Line::from(""),
+                    Line::from(
+                        vec![
+                            Span::from("features include qr code check-ins and a live agenda, message feed, and push notifications to keep attendees updated")
+                        .fg(Color::Rgb(147, 147, 147))]
+                        ),
+                    Line::from(""),
+                    Line::from(vec![
+                        Span::from("notable highlights:")
+                            .fg(Color::Rgb(147, 147, 147))
+                    ]),
+                    Line::from(vec![
+                        Span::from("- deployed to the ios app store as 'power um-d'").fg(Color::Rgb(147, 147, 147))
+                    ]),
+                    Line::from(vec![
+                        Span::from("- supported 80+ attendees").fg(Color::Rgb(147, 147, 147))
+                    ])
+                ]
+            }
+            4 => {
+                vec![
+                    Line::from(vec![
+                        Span::from("built the michigan devfest 2023 website on a team of 8")
+                            .fg(Color::Rgb(147, 147, 147)),
+                    ]),
+                    Line::from(""),
+                    Line::from(vec![
+                        Span::from("notable highlights:").fg(Color::Rgb(147, 147, 147)),
+                    ]),
+                    Line::from(vec![
+                        Span::from("- website drove 300+ event attendees")
+                            .fg(Color::Rgb(147, 147, 147)),
+                    ]),
+                ]
+            }
+            5 => {
+                vec![
+                    Line::from(vec![
+                        Span::from(
+                            "designed a blog platform to showcase Detroit's underground culture",
+                        )
+                        .fg(Color::Rgb(147, 147, 147)),
+                    ]),
+                    Line::from(""),
+                    Line::from(vec![
+                        Span::from("notable highlights:").fg(Color::Rgb(147, 147, 147)),
+                    ]),
+                    Line::from(vec![
+                        Span::from("- engaged an audience of 2500+ followers")
+                            .fg(Color::Rgb(147, 147, 147)),
+                    ]),
+                ]
+            }
+            6 => {
+                vec![Line::from(vec![
+                    Span::from("created gpt-3 wrapper that summarized videos, audio, and text as part of the 2023 ai camp incubator program").fg(Color::Rgb(147, 147, 147)),
+                ]),
+                Line::from(""),
+                Line::from(vec![
+                    Span::from("notable highlights:").fg(Color::Rgb(147, 147, 147)),
+                ]),
+                Line::from(vec![
+                    Span::from("- won $500 by placing 2nd place out of 21 other teams")
+                        .fg(Color::Rgb(147, 147, 147)),
+                ]),]
+            }
+            _ => {
+                vec![]
+            }
+        };
+
+        description.insert(0, Line::from(vec![Span::from("desc").fg(Color::White)]));
+
+        Paragraph::new(description).wrap(Wrap { trim: true })
     }
 
     fn build_projects_page(&self) -> Block<'_> {
