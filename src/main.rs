@@ -5,14 +5,22 @@ use ratatui::{
     layout::{Constraint, Flex, Layout},
     style::{Color, Style, Stylize},
     symbols,
-    text::{Line, Span},
+    text::Span,
     widgets::{
-        Block, Borders, Cell, List, ListItem, Padding, Paragraph, Row, Table, Wrap,
+        Block, Borders, List, ListItem, Padding,
         canvas::{Canvas, Points},
     },
 };
 use std::fs;
 use std::{io, sync::mpsc, thread, time::Duration};
+
+mod pages;
+use pages::{
+    about::{About, ContactLink},
+    experience::{Experience as ExperiencePage, ExperienceItem},
+    projects::Projects,
+    leadership::Leadership,
+};
 
 fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
     const LIMIT_TO_10_FRAMES: bool = true; // Set to true to only load first 10 frames
@@ -121,38 +129,38 @@ fn main() -> io::Result<()> {
         },
     ];
 
-    let experience = vec![
-        Experience {
+    let experience_items = vec![
+        ExperienceItem {
             role: String::from("swe intern"),
             affiliation: String::from("capital one"),
             time: String::from("(jun 2026-aug 2026)"),
         },
-        Experience {
+        ExperienceItem {
             role: String::from("ceo / cto"),
             affiliation: String::from("ootd"),
             time: String::from("(mar 2025-oct 2025)"),
         },
-        Experience {
+        ExperienceItem {
             role: String::from("swe intern"),
             affiliation: String::from("capital one"),
             time: String::from("(jun 2025-aug 2025)"),
         },
-        Experience {
+        ExperienceItem {
             role: String::from("mobile app dev"),
             affiliation: String::from("swe, um-dearborn"),
             time: String::from("(feb 2025-mar 2025)"),
         },
-        Experience {
+        ExperienceItem {
             role: String::from("frontend dev"),
             affiliation: String::from("gdsc, um-dearborn"),
             time: String::from("(nov 2023-dec 2023)"),
         },
-        Experience {
+        ExperienceItem {
             role: String::from("fullstack dev"),
             affiliation: String::from("adhd magazine"),
             time: String::from("(may 2023-aug 2023)"),
         },
-        Experience {
+        ExperienceItem {
             role: String::from("incubatee"),
             affiliation: String::from("ai camp"),
             time: String::from("(sep 2022-nov 2022)"),
@@ -163,14 +171,13 @@ fn main() -> io::Result<()> {
         running: true,
         selected_page: 0,
         count: 0,
-        links: links.clone(),
-        experience,
         pages,
         all_frames,
         max_frames,
-        about_page_state: 0,
-        experience_page_state: 0,
-        current_link: links[0].link.clone(),
+        about_page: About::new(links),
+        experience_page: ExperiencePage::new(experience_items),
+        projects_page: Projects::new(),
+        leadership_page: Leadership::new(),
     };
 
     let mut terminal = ratatui::init();
@@ -220,36 +227,18 @@ fn run_background_thread(tx: mpsc::Sender<Event>, max_frames: usize) {
     }
 }
 
-#[derive(Clone)]
-struct ContactLink {
-    display_text: String,
-    link: String,
-}
-
-struct Experience {
-    role: String,
-    affiliation: String,
-    time: String,
-}
-
-impl Experience {
-    const fn ref_array(&self) -> [&String; 3] {
-        [&self.role, &self.affiliation, &self.time]
-    }
-}
 
 struct App<'a> {
     running: bool,
     selected_page: usize,
     count: usize,
     max_frames: usize,
-    about_page_state: usize,
-    experience_page_state: usize,
-    current_link: String,
-    links: Vec<ContactLink>,
-    experience: Vec<Experience>,
     pages: Vec<&'a str>,
     all_frames: Vec<Vec<Vec<[u8; 3]>>>,
+    about_page: About,
+    experience_page: ExperiencePage,
+    projects_page: Projects,
+    leadership_page: Leadership,
 }
 
 impl<'a> App<'a> {
@@ -315,20 +304,20 @@ impl<'a> App<'a> {
         let menu_widget = self.build_menu_widget();
         match self.selected_page {
             0 => {
-                let about_page = self.build_about_page();
-                frame.render_widget(about_page, center_area);
+                let about_widget = self.about_page.build();
+                frame.render_widget(about_widget, center_area);
             }
             1 => {
-                let experience_page = self.build_experience_page();
-                frame.render_widget(experience_page, center_area);
+                let experience_widget = self.experience_page.build();
+                frame.render_widget(experience_widget, center_area);
             }
             2 => {
-                let projects_page = self.build_projects_page();
-                frame.render_widget(projects_page, center_area);
+                let projects_widget = self.projects_page.build();
+                frame.render_widget(projects_widget, center_area);
             }
             3 => {
-                let leadership_page = self.build_leadership_page();
-                frame.render_widget(leadership_page, center_area);
+                let leadership_widget = self.leadership_page.build();
+                frame.render_widget(leadership_widget, center_area);
             }
             _ => {}
         }
@@ -367,10 +356,10 @@ impl<'a> App<'a> {
         match self.selected_page {
             0 => frame.render_widget(canvas, canvas_area),
             1 => {
-                let description = self.build_experience_description();
+                let description = self.experience_page.build_description();
                 frame.render_widget(description, canvas_area)
             }
-            _ => {}
+            _ => {},
         };
     }
 
@@ -382,388 +371,40 @@ impl<'a> App<'a> {
 
     fn next_page(&mut self) {
         if self.selected_page + 1 < self.pages.len() {
-            if self.selected_page == 0 {
-                self.current_link = String::from("");
-            }
             self.selected_page += 1;
         }
     }
 
-    fn previous_link(&mut self) {
-        if self.selected_page != 0 {
-            return;
-        }
-
-        if self.about_page_state > 0 {
-            self.about_page_state -= 1;
-            self.current_link = self.links[self.about_page_state].link.to_owned();
-        }
-    }
-
-    fn next_link(&mut self) {
-        if self.selected_page != 0 {
-            return;
-        }
-
-        if self.about_page_state < self.links.len() - 1 {
-            self.about_page_state += 1;
-            self.current_link = self.links[self.about_page_state].link.to_owned();
-        }
-    }
-
-    fn previous_experience(&mut self) {
-        if self.selected_page != 1 {
-            return;
-        }
-
-        if self.experience_page_state > 0 {
-            self.experience_page_state -= 1;
-        }
-    }
-
-    fn next_experience(&mut self) {
-        if self.selected_page != 1 {
-            return;
-        }
-
-        if self.experience_page_state < self.experience.len() - 1 {
-            self.experience_page_state += 1;
-        }
-    }
-
-    fn open_current_link(&mut self) {
-        if !&self.current_link.is_empty() {
-            open::that(&self.current_link).unwrap();
-        }
-    }
 
     fn handle_key_event(&mut self, key_event: crossterm::event::KeyEvent) -> io::Result<()> {
         match key_event.code {
             KeyCode::Char('q') => {
                 self.running = false;
             }
-            KeyCode::Left => self.previous_link(),
-            KeyCode::Right => self.next_link(),
             KeyCode::Up => self.previous_page(),
             KeyCode::Down => self.next_page(),
-            KeyCode::Enter => self.open_current_link(),
-            KeyCode::Char('k') => self.previous_experience(),
-            KeyCode::Char('j') => self.next_experience(),
-            _ => {}
+            _ => {
+                // Delegate to current page's keyboard handler
+                let handled = match self.selected_page {
+                    0 => {
+                        if let Some(link) = self.about_page.keyboard_event_handler(key_event.code) {
+                            open::that(&link).unwrap();
+                        }
+                        true
+                    }
+                    1 => self.experience_page.keyboard_event_handler(key_event.code),
+                    2 => self.projects_page.keyboard_event_handler(key_event.code),
+                    3 => self.leadership_page.keyboard_event_handler(key_event.code),
+                    _ => false,
+                };
+                // handled variable is available for future use if needed
+                let _ = handled;
+            }
         }
 
         Ok(())
     }
 
-    fn build_about_page(&self) -> Paragraph<'_> {
-        let line_1 = Line::from(vec![
-            Span::styled(
-                "hey! my name is ",
-                Style::default().fg(Color::Rgb(147, 147, 147)),
-            ),
-            Span::styled(
-                "kieran llarena",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
-        ]);
-
-        let line_2 = Line::from(vec![
-            Span::styled(
-                "im currently studying ",
-                Style::default().fg(Color::Rgb(147, 147, 147)),
-            ),
-            Span::styled(
-                "computer science ",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
-            Span::styled("at the ", Style::default().fg(Color::Rgb(147, 147, 147))),
-            Span::styled(
-                "university of michigan-dearborn",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
-        ]);
-
-        let line_3 = Line::from(vec![
-            Span::styled(
-                "my expected graduation date is ",
-                Style::default().fg(Color::Rgb(147, 147, 147)),
-            ),
-            Span::styled("may 2027", Style::default().fg(Color::Rgb(255, 255, 255))),
-        ]);
-
-        let line_4 = Line::from(vec![
-            Span::styled(
-                "i thrive best in environments that value ",
-                Style::default().fg(Color::Rgb(147, 147, 147)),
-            ),
-            Span::styled(
-                "high velocity ",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
-            Span::styled("and ", Style::default().fg(Color::Rgb(147, 147, 147))),
-            Span::styled(
-                "strong ownership",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
-        ]);
-
-        let line_5 = Line::from(vec![
-            Span::styled(
-                "my background is rooted in ",
-                Style::default().fg(Color::Rgb(147, 147, 147)),
-            ),
-            Span::styled(
-                "web and mobile fullstack development",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
-        ]);
-
-        let line_6 = Line::from(vec![
-            Span::styled(
-                "im currently exploring ",
-                Style::default().fg(Color::Rgb(147, 147, 147)),
-            ),
-            Span::styled(
-                "systems programming",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
-            Span::styled(
-                ", specifically working with ",
-                Style::default().fg(Color::Rgb(147, 147, 147)),
-            ),
-            Span::styled(
-                "embedded Rust on microcontrollers",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
-        ]);
-
-        let line_items: Vec<Span> = (0..(self.links.len() * 2) - 1)
-            .map(move |index| {
-                if (index + 1) % 2 == 0 {
-                    return Span::styled(" - ", Style::default().fg(Color::Rgb(147, 147, 147)));
-                }
-
-                let style_config = match index / 2 == self.about_page_state {
-                    true => Style::default().fg(Color::Rgb(0, 255, 251)).underlined(),
-                    false => Style::default().fg(Color::Rgb(147, 147, 147)),
-                };
-
-                let display_text = self.links[index / 2].display_text.to_owned();
-                let _link = self.links[index / 2].link.to_owned();
-
-                Span::styled(display_text, style_config)
-            })
-            .collect();
-
-        let links_line = Line::from(line_items);
-
-        Paragraph::new(vec![
-            line_1,
-            Line::from(""),
-            line_2,
-            Line::from(""),
-            line_3,
-            Line::from(""),
-            line_4,
-            Line::from(""),
-            line_5,
-            Line::from(""),
-            line_6,
-            Line::from(""),
-            links_line,
-        ])
-        .block(Block::new().padding(Padding {
-            left: 1,
-            right: 2,
-            top: 0,
-            bottom: 0,
-        }))
-        .wrap(Wrap { trim: true })
-    }
-
-    fn build_experience_page(&self) -> Table<'_> {
-        let header = ["role", "affiliation", "time"]
-            .into_iter()
-            .map(Cell::from)
-            .collect::<Row>()
-            .height(1);
-
-        let rows = self.experience.iter().enumerate().map(|(i, data)| {
-            let item = data.ref_array();
-
-            let style_config = match i == self.experience_page_state {
-                true => Style::new().fg(Color::Rgb(0, 0, 0)).bg(Color::White),
-                false => Style::new().fg(Color::Rgb(147, 147, 147)),
-            };
-
-            item.into_iter()
-                .map(|content| Cell::from(content.as_str()))
-                .collect::<Row>()
-                .style(style_config)
-                .height(1)
-        });
-
-        let final_table = Table::new(
-            rows,
-            [
-                Constraint::Fill(1),
-                Constraint::Fill(1),
-                Constraint::Fill(1),
-            ],
-        )
-        .header(header)
-        .block(Block::new().padding(Padding {
-            left: 1,
-            right: 2,
-            top: 0,
-            bottom: 0,
-        }));
-
-        final_table
-    }
-
-    fn build_experience_description(&self) -> Paragraph<'_> {
-        let mut description: Vec<Line<'_>> = match self.experience_page_state {
-            0 => {
-                vec![Line::from(vec![
-                    Span::from("incoming summer 2026 under the tip program")
-                        .fg(Color::Rgb(147, 147, 147)),
-                ])]
-            }
-            1 => {
-                vec![
-                    Line::from(
-                        vec![
-                            Span::from("led a team of 4 to ship an irl dress to impress mobile app with 260+ users")
-                        .fg(Color::Rgb(147, 147, 147))]
-                        ),
-                    Line::from(""),
-                    Line::from(vec![
-                        Span::from("notable highlights:")
-                        .fg(Color::Rgb(147, 147, 147))
-                    ]),
-                    Line::from(vec![
-                        Span::from("- achieved a 3x boost in DAU retention by analyzing user behavior patterns and implementing targeted push notifications").fg(Color::Rgb(147, 147, 147))
-                    ])
-                ]
-            }
-            2 => {
-                vec![
-                    Line::from(
-                        vec![
-                            Span::from("worked on the capital one empath dashboard on a team of 5")
-                        .fg(Color::Rgb(147, 147, 147))
-                        ]
-                        ),
-                    Line::from(""),
-                    Line::from(vec![
-                        Span::from("notable highlights:")
-                        .fg(Color::Rgb(147, 147, 147))
-                    ]),
-                    Line::from(
-                        vec![
-                            Span::from("- created a digital enrollment status badge to help reduce Capital One agent call times by 12%")
-                        .fg(Color::Rgb(147, 147, 147))
-                        ]
-                        )
-                ]
-            }
-            3 => {
-                vec![
-                    Line::from(
-                        vec![
-                            Span::from("solo developed an event management mobile app for the society of women engineers at the university of michigan-dearborn's power conference")
-                        .fg(Color::Rgb(147, 147, 147))]
-                        ),
-                    Line::from(""),
-                    Line::from(
-                        vec![
-                            Span::from("features include qr code check-ins and a live agenda, message feed, and push notifications to keep attendees updated")
-                        .fg(Color::Rgb(147, 147, 147))]
-                        ),
-                    Line::from(""),
-                    Line::from(vec![
-                        Span::from("notable highlights:")
-                            .fg(Color::Rgb(147, 147, 147))
-                    ]),
-                    Line::from(vec![
-                        Span::from("- deployed to the ios app store as 'power um-d'").fg(Color::Rgb(147, 147, 147))
-                    ]),
-                    Line::from(vec![
-                        Span::from("- supported 80+ attendees").fg(Color::Rgb(147, 147, 147))
-                    ])
-                ]
-            }
-            4 => {
-                vec![
-                    Line::from(vec![
-                        Span::from("built the michigan devfest 2023 website on a team of 8")
-                            .fg(Color::Rgb(147, 147, 147)),
-                    ]),
-                    Line::from(""),
-                    Line::from(vec![
-                        Span::from("notable highlights:").fg(Color::Rgb(147, 147, 147)),
-                    ]),
-                    Line::from(vec![
-                        Span::from("- website drove 300+ event attendees")
-                            .fg(Color::Rgb(147, 147, 147)),
-                    ]),
-                ]
-            }
-            5 => {
-                vec![
-                    Line::from(vec![
-                        Span::from(
-                            "designed a blog platform to showcase Detroit's underground culture",
-                        )
-                        .fg(Color::Rgb(147, 147, 147)),
-                    ]),
-                    Line::from(""),
-                    Line::from(vec![
-                        Span::from("notable highlights:").fg(Color::Rgb(147, 147, 147)),
-                    ]),
-                    Line::from(vec![
-                        Span::from("- engaged an audience of 2500+ followers")
-                            .fg(Color::Rgb(147, 147, 147)),
-                    ]),
-                ]
-            }
-            6 => {
-                vec![Line::from(vec![
-                    Span::from("created gpt-3 wrapper that summarized videos, audio, and text as part of the 2023 ai camp incubator program").fg(Color::Rgb(147, 147, 147)),
-                ]),
-                Line::from(""),
-                Line::from(vec![
-                    Span::from("notable highlights:").fg(Color::Rgb(147, 147, 147)),
-                ]),
-                Line::from(vec![
-                    Span::from("- won $500 by placing 2nd place out of 21 other teams")
-                        .fg(Color::Rgb(147, 147, 147)),
-                ]),]
-            }
-            _ => {
-                vec![]
-            }
-        };
-
-        description.insert(0, Line::from(vec![Span::from("desc").fg(Color::White)]));
-
-        Paragraph::new(description).wrap(Wrap { trim: true })
-    }
-
-    fn build_projects_page(&self) -> Block<'_> {
-        Block::new()
-            .borders(Borders::ALL)
-            .title("Projects")
-            .border_style(Color::Red)
-    }
-
-    fn build_leadership_page(&self) -> Block<'_> {
-        Block::new()
-            .borders(Borders::ALL)
-            .title("Leadership")
-            .border_style(Color::Green)
-    }
 
     fn build_menu_widget(&self) -> List<'_> {
         let menu_items: Vec<ListItem> = (0..self.pages.len())
