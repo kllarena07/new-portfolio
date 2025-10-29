@@ -107,7 +107,7 @@ impl Experience {
                         .fg(Color::Rgb(147, 147, 147))
                     ]),
                     Line::from(vec![
-                        Span::from("- achieved a 3x boost in DAU retention by analyzing user behavior patterns and implementing targeted push notifications").fg(Color::Rgb(147, 147, 147))
+                        Span::from("- achieved a 3x boost in dau retention by analyzing user behavior patterns and implementing targeted push notifications").fg(Color::Rgb(147, 147, 147))
                     ])
                 ]
             }
@@ -178,7 +178,7 @@ impl Experience {
                 vec![
                     Line::from(vec![
                         Span::from(
-                            "designed a blog platform to showcase Detroit's underground culture",
+                            "designed a blog platform to showcase detroit's underground culture",
                         )
                         .fg(Color::Rgb(147, 147, 147)),
                     ]),
