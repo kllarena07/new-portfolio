@@ -13,7 +13,7 @@ struct ProjectItem {
     name: String,
     project_type: String,
     prizes: Vec<String>,
-    description: String,
+    description: Vec<String>,
     technologies: Vec<String>,
 }
 
@@ -94,9 +94,14 @@ impl Projects {
             ProjectItem {
                 name: String::from("ecollm"),
                 prizes: vec![String::from("🏆 best social impact")],
-                description: String::from(
-                    "an adaptive ai model training tool for llms, optimized to minimize carbon footprint by leveraging aws sagemaker and dynamically shifting data centers to reduce emissions through a custom integration, while using aws s3 to ensure fast, reliable data transfers across aws regions",
-                ),
+                description: vec![
+                    String::from(
+                        "an adaptive ai model training tool for llms, optimized to minimize carbon footprint",
+                    ),
+                    String::from(
+                        "persists training epochs/checkpoints to aws s3 and orchestrates aws sagemaker jobs while dynamically rebalancing workloads across aws regions in real time to reduce carbon emissions",
+                    ),
+                ],
                 technologies: vec![
                     String::from("aws sagemaker"),
                     String::from("aws s3"),
@@ -111,9 +116,17 @@ impl Projects {
                     String::from("🏆 best software dev tool (sponsored by warp)"),
                     String::from("🏆 best use of modal (Sponsored by modal labs)"),
                 ],
-                description: String::from(
-                    "a developer tool that uses generative ai to streamline maintenance by scanning your codebase, detecting outdated dependencies or vulnerabilities, and automatically generating prs with refactored code, while also providing a dashboard with insights into the refactor process for full visibility and control",
-                ),
+                description: vec![
+                    String::from(
+                        "a developer tool that uses llms to ensure developers are shipping instead of maintaining",
+                    ),
+                    String::from(
+                        "scans codebases in seconds by parallelizing file checks for outdated deps/vulnerabilities with modal + groq",
+                    ),
+                    String::from(
+                        "auto generates prs for refactors while also providing a dashboard with insights into the refactor process for full visibility",
+                    ),
+                ],
                 technologies: vec![
                     String::from("fastapi"),
                     String::from("groq"),
@@ -126,9 +139,14 @@ impl Projects {
             ProjectItem {
                 name: String::from("ootd, outfit of the day"),
                 prizes: vec![String::from("🏆 zero waste award (sustainability track)")],
-                description: String::from(
-                    "a social media fashion app that lets users post their outfits, explore and vote on looks from others, try clothes on virtually, and shop their favorite pieces, all within the app",
-                ),
+                description: vec![
+                    String::from(
+                        "the all-in-one social media fashion app. users post their outfits, explore and vote on looks from others, try clothes on virtually, and shop their favorite pieces",
+                    ),
+                    String::from(
+                        "users can share their outfits, explore and vote on looks from others, try clothes on virtually, and shop their favorite pieces",
+                    ),
+                ],
                 technologies: vec![
                     String::from("nextjs"),
                     String::from("typescript"),
@@ -139,9 +157,17 @@ impl Projects {
             ProjectItem {
                 name: String::from("manny-bot"),
                 prizes: vec![],
-                description: String::from(
-                    "noticing how my fellow e-board members could benefit from a way to streamline discord announcement by scheduling them, i took matters into my own hands by developing such a mechanism from scratch. on the web dashboard, announcements can be previewed using a built-in markdown previewer and then scheduled to be sent out",
-                ),
+                description: vec![
+                    String::from(
+                        "a web dashboard for scheduling discord announcements built for the student association of filipino americans at the university of michigan-dearborn",
+                    ),
+                    String::from(
+                        "web dashboard is split into two sections: composer and previewer",
+                    ),
+                    String::from(
+                        "upon scheduling, media assets are persisted to s3. an eventbridge schedule is created with a payload (s3 urls + message body). at runtime, the schedule invokes a lambda function, which reads the payload and publishes to a discord webhook",
+                    ),
+                ],
                 technologies: vec![
                     String::from("nextjs"),
                     String::from("typescript"),
@@ -149,31 +175,42 @@ impl Projects {
                     String::from("aws lambda"),
                     String::from("aws eventbridge scheduler"),
                     String::from("kinde auth"),
-                    String::from("discord api"),
+                    String::from("webhooks"),
                 ],
                 project_type: String::from("personal"),
             },
             ProjectItem {
                 name: String::from("sheltr"),
                 prizes: vec![String::from("🏆 2nd place winner overall")],
-                description: String::from(
-                    "a crowdsourced disaster management platform that gives real-time incident updates and lets users report local emergencies through a community-driven system. users can see a live feed of emergencies near them, add location-based disaster reports with key details, and rely on a prioritization system that highlights the most critical updates based on community engagement, helping everyone stay aware and respond faster",
-                ),
+                description: vec![
+                    String::from(
+                        "a crowdsourced disaster-management platform that aids both locals and responders during the january 2025 southern california wildfires",
+                    ),
+                    String::from(
+                        "the app real-time incident updates and lets users report local emergencies through a community-driven system",
+                    ),
+                    String::from(
+                        "users can view a live feed of nearby emergencies, submit location‑based disaster reports with key details, and see prioritized updates based on community engagement",
+                    ),
+                ],
                 technologies: vec![
-                    String::from("fastapi"),
-                    String::from("groq"),
-                    String::from("modal"),
                     String::from("nextjs"),
                     String::from("typescript"),
+                    String::from("supabase"),
                 ],
                 project_type: String::from("hackathon (waynehacks 3)"),
             },
             ProjectItem {
                 name: String::from("youtube copilot"),
                 prizes: vec![String::from("🏆 5th place winner overall")],
-                description: String::from(
-                    "developed a chrome extension that works directly with youtube, using retrieval-augmented generation to let users have real-time, ai-powered conversations with videos by asking questions and getting relevant answers as they watch",
-                ),
+                description: vec![
+                    String::from(
+                        "a chrome extension that enables ai conversations with youtube videos",
+                    ),
+                    String::from(
+                        "leverages retrieval‑augmented generation (rag) over the video transcript and the active frame to provide context-aware answers to user prompts during playback",
+                    ),
+                ],
                 technologies: vec![
                     String::from("pinecone"),
                     String::from("flask"),
@@ -187,12 +224,16 @@ impl Projects {
             ProjectItem {
                 name: String::from("safety blanket"),
                 prizes: vec![],
-                description: String::from(
-                    "a virtual companion app that enhances personal security and emotional support by featuring an ai Companion for real-time phone calls to provide comfort and reduce anxiety, real-time text chat check-ins that escalate to location sharing if the user is unresponsive, and a safety timer that triggers emergency alerts if not deactivated in time",
-                ),
+                description: vec![
+                    String::from("a virtual companion app built for women traveling at night"),
+                    String::from(
+                        "the app offers several ai-driven safety measures that escalate to authorities when needed: real-time text check-ins, a safety timer, and safe-word triggers during audio calls",
+                    ),
+                ],
                 technologies: vec![
                     String::from("nextjs"),
                     String::from("typescript"),
+                    String::from("firebase"),
                     String::from("websocket"),
                     String::from("retell ai"),
                     String::from("pythonj"),
@@ -217,8 +258,11 @@ impl Projects {
         if project_item.prizes.len() > 0 {
             final_vec.push(Line::from(""));
         }
-        final_vec
-            .push(Line::from(project_item.description.to_string()).fg(Color::Rgb(147, 147, 147)));
+
+        for desc_part in &project_item.description {
+            final_vec.push(Line::from(desc_part.to_string()).fg(Color::Rgb(147, 147, 147)));
+            final_vec.push(Line::from(""));
+        }
 
         final_vec
     }
