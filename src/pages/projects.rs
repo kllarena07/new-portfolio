@@ -98,6 +98,7 @@ impl Projects {
                     String::from(
                         "an adaptive ai model training tool for llms, optimized to minimize carbon footprint",
                     ),
+                    String::from(""),
                     String::from(
                         "persists training epochs/checkpoints to aws s3 and orchestrates aws sagemaker jobs while dynamically rebalancing workloads across aws regions in real time to reduce carbon emissions",
                     ),
@@ -120,11 +121,13 @@ impl Projects {
                     String::from(
                         "a developer tool that uses llms to ensure developers are shipping instead of maintaining",
                     ),
+                    String::from(""),
                     String::from(
-                        "scans codebases in seconds by parallelizing file checks for outdated deps/vulnerabilities with modal + groq",
+                        "scans codebases in seconds by parallelizing file checks for outdated deps/vulnerabilities with modal and groq",
                     ),
+                    String::from(""),
                     String::from(
-                        "auto generates prs for refactors while also providing a dashboard with insights into the refactor process for full visibility",
+                        "auto-generates refactor prs and provides an insights dashboard for end‑to‑end visibility and control",
                     ),
                 ],
                 technologies: vec![
@@ -140,9 +143,8 @@ impl Projects {
                 name: String::from("ootd, outfit of the day"),
                 prizes: vec![String::from("🏆 zero waste award (sustainability track)")],
                 description: vec![
-                    String::from(
-                        "the all-in-one social media fashion app. users post their outfits, explore and vote on looks from others, try clothes on virtually, and shop their favorite pieces",
-                    ),
+                    String::from("the all-in-one social media fashion app"),
+                    String::from(""),
                     String::from(
                         "users can share their outfits, explore and vote on looks from others, try clothes on virtually, and shop their favorite pieces",
                     ),
@@ -159,13 +161,15 @@ impl Projects {
                 prizes: vec![],
                 description: vec![
                     String::from(
-                        "a web dashboard for scheduling discord announcements built for the student association of filipino americans at the university of michigan-dearborn",
+                        "a web dashboard for scheduling discord announcements, built for the student association for filipino americans at um-dearborn",
                     ),
+                    String::from(""),
                     String::from(
-                        "web dashboard is split into two sections: composer and previewer",
+                        "the dashboard, locked behind authentication, is split into two sections: composer and previewer. the composer supports markdown input and file uploads while the previewer renders the output",
                     ),
+                    String::from(""),
                     String::from(
-                        "upon scheduling, media assets are persisted to s3. an eventbridge schedule is created with a payload (s3 urls + message body). at runtime, the schedule invokes a lambda function, which reads the payload and publishes to a discord webhook",
+                        "upon scheduling, media assets are persisted to s3 and an eventbridge schedule is created with a payload (s3 urls + message body). at runtime, the schedule invokes a lambda function, which reads the payload and publishes to a discord webhook",
                     ),
                 ],
                 technologies: vec![
@@ -184,11 +188,9 @@ impl Projects {
                 prizes: vec![String::from("🏆 2nd place winner overall")],
                 description: vec![
                     String::from(
-                        "a crowdsourced disaster-management platform that aids both locals and responders during the january 2025 southern california wildfires",
+                        "a real-time crowdsourced disaster-management platform aimed to help both locals and responders during the january 2025 southern california wildfires",
                     ),
-                    String::from(
-                        "the app real-time incident updates and lets users report local emergencies through a community-driven system",
-                    ),
+                    String::from(""),
                     String::from(
                         "users can view a live feed of nearby emergencies, submit location‑based disaster reports with key details, and see prioritized updates based on community engagement",
                     ),
@@ -207,6 +209,7 @@ impl Projects {
                     String::from(
                         "a chrome extension that enables ai conversations with youtube videos",
                     ),
+                    String::from(""),
                     String::from(
                         "leverages retrieval‑augmented generation (rag) over the video transcript and the active frame to provide context-aware answers to user prompts during playback",
                     ),
@@ -225,9 +228,18 @@ impl Projects {
                 name: String::from("safety blanket"),
                 prizes: vec![],
                 description: vec![
-                    String::from("a virtual companion app built for women traveling at night"),
                     String::from(
-                        "the app offers several ai-driven safety measures that escalate to authorities when needed: real-time text check-ins, a safety timer, and safe-word triggers during audio calls",
+                        "a virtual companion app built to provide security for women traveling at night",
+                    ),
+                    String::from(""),
+                    String::from(
+                        "the app offers several ai-driven safety measures that support automated escalation to authorities:",
+                    ),
+                    String::from(""),
+                    String::from("1. real-time text check-ins"),
+                    String::from("2. a safety timer with countdown/expiry events"),
+                    String::from(
+                        "3. voice-call interface that simulates talking to a real person, with safe-word detection",
                     ),
                 ],
                 technologies: vec![
@@ -261,7 +273,6 @@ impl Projects {
 
         for desc_part in &project_item.description {
             final_vec.push(Line::from(desc_part.to_string()).fg(Color::Rgb(147, 147, 147)));
-            final_vec.push(Line::from(""));
         }
 
         final_vec

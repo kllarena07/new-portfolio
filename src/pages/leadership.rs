@@ -66,25 +66,37 @@ impl Leadership {
             0 => {
                 vec![
                     Line::from(
-                        Span::from("helping make tech more accessible for filipinos by building the largest network of filipino tech professionals").fg(Color::Rgb(147, 147, 147)),
+                        Span::from("building the largest network of filipino tech professionals to help make tech more accessible for filipinos. currently at 263 members").fg(Color::Rgb(147, 147, 147)),
                     ),
                     Line::from(""),
                     Line::from(
-                        Span::from("collaborated amazon, dreamhaven, and aapi in gaming. organized a hackathon to help filipino businesses that was sponsored by vercel, warp, and sorce (yc f25)").fg(Color::Rgb(147, 147, 147)),
+                        Span::from("notable highlights:").fg(Color::Rgb(147, 147, 147)),
                     ),
-                    Line::from(""),
                     Line::from(
-                        Span::from("currently at 263 members and growing").fg(Color::Rgb(147, 147, 147)),
+                        Span::from("- collaborated amazon, dreamhaven, and aapi in gaming").fg(Color::Rgb(147, 147, 147)),
+                    ),
+                    Line::from(
+                        Span::from("- organized a hackathon to help filipino businesses that was sponsored by vercel, warp, and sorce (yc f25)").fg(Color::Rgb(147, 147, 147)),
                     ),
                 ]
             }
             1 => {
-                vec![Line::from(
-                    Span::from(
-                        "built a 6k+ member hackathon community with $2k in sponsorship backing from companies like koyeb and tensordock",
+                vec![
+                    Line::from(
+                        Span::from(
+                            "built a 6,000+ member hackathon community",
+                        ).fg(Color::Rgb(147, 147, 147))
+                    ),
+                    Line::from(""),
+                    Line::from(
+                        Span::from("notable highlights:").fg(Color::Rgb(147, 147, 147)),
+                    ),
+                    Line::from(
+                        Span::from(
+                            "- secured $2k in sponsorship backing from companies like koyeb and tensordock",
+                        ).fg(Color::Rgb(147, 147, 147))
                     )
-                    .fg(Color::Rgb(147, 147, 147)),
-                )]
+                ]
             }
             _ => vec![],
         }
