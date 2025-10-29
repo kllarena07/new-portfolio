@@ -12,13 +12,14 @@ use std::{io, sync::mpsc, thread, time::Duration};
 mod pages;
 use pages::{about::About, experience::Experience, page::Page};
 
-use crate::pages::projects::Projects;
+use crate::pages::{leadership::Leadership, projects::Projects};
 
 fn main() -> io::Result<()> {
     let pages: Vec<Box<dyn Page>> = vec![
         Box::new(About::new()),
         Box::new(Experience::new()),
         Box::new(Projects::new()),
+        Box::new(Leadership::new()),
     ];
 
     let mut app = App {
