@@ -3,13 +3,12 @@ use ratatui::{
     Frame,
     layout::Constraint,
     layout::Rect,
-    style::{Color, Style},
     text::Line,
     widgets::{Block, Cell, Padding, Paragraph, Row, Table, Wrap},
 };
 
 use crate::pages::page::Page;
-use crate::pages::style::{gray_span, line_from_spans, selected_style, white_span};
+use crate::pages::style::{gray_span, gray_style, line_from_spans, selected_style, white_span};
 
 struct ExperienceItem {
     role: String,
@@ -111,7 +110,7 @@ impl Page for Leadership {
 
             let style_config = match i == self.state {
                 true => selected_style(),
-                false => Style::new().fg(Color::Rgb(147, 147, 147)),
+                false => gray_style(),
             };
 
             item.into_iter()
