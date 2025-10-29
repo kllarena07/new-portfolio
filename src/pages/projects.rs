@@ -2,8 +2,8 @@ use crossterm::event::KeyCode;
 use ratatui::{
     Frame,
     layout::{Constraint, Rect},
-    style::{Color, Style, Stylize},
-    text::{Line, Span},
+    style::{Color, Style},
+    text::Line,
     widgets::{Block, Cell, Padding, Paragraph, Row, Table, Wrap},
 };
 
@@ -15,7 +15,6 @@ struct ProjectItem {
     project_type: String,
     prizes: Vec<String>,
     description: Vec<String>,
-    technologies: Vec<String>,
 }
 
 impl ProjectItem {
@@ -104,12 +103,6 @@ impl Projects {
                         "persists training epochs/checkpoints to aws s3 and orchestrates aws sagemaker jobs while dynamically rebalancing workloads across aws regions in real time to reduce carbon emissions",
                     ),
                 ],
-                technologies: vec![
-                    String::from("aws sagemaker"),
-                    String::from("aws s3"),
-                    String::from("nextjs"),
-                    String::from("typescript"),
-                ],
                 project_type: String::from("hackathon (revolutionuc 2025)"),
             },
             ProjectItem {
@@ -131,13 +124,6 @@ impl Projects {
                         "auto-generates refactor prs and provides an insights dashboard for end‑to‑end visibility and control",
                     ),
                 ],
-                technologies: vec![
-                    String::from("fastapi"),
-                    String::from("groq"),
-                    String::from("modal"),
-                    String::from("nextjs"),
-                    String::from("typescript"),
-                ],
                 project_type: String::from("hackathon (columbia devfest 2025)"),
             },
             ProjectItem {
@@ -149,11 +135,6 @@ impl Projects {
                     String::from(
                         "users can share their outfits, explore and vote on looks from others, try clothes on virtually, and shop their favorite pieces",
                     ),
-                ],
-                technologies: vec![
-                    String::from("nextjs"),
-                    String::from("typescript"),
-                    String::from("supabase"),
                 ],
                 project_type: String::from("hackathon (msu spartahack x)"),
             },
@@ -173,15 +154,6 @@ impl Projects {
                         "upon scheduling, media assets are persisted to s3 and an eventbridge schedule is created with a payload (s3 urls + message body). at runtime, the schedule invokes a lambda function, which reads the payload and publishes to a discord webhook",
                     ),
                 ],
-                technologies: vec![
-                    String::from("nextjs"),
-                    String::from("typescript"),
-                    String::from("aws s3"),
-                    String::from("aws lambda"),
-                    String::from("aws eventbridge scheduler"),
-                    String::from("kinde auth"),
-                    String::from("webhooks"),
-                ],
                 project_type: String::from("personal"),
             },
             ProjectItem {
@@ -196,11 +168,6 @@ impl Projects {
                         "users can view a live feed of nearby emergencies, submit location‑based disaster reports with key details, and see prioritized updates based on community engagement",
                     ),
                 ],
-                technologies: vec![
-                    String::from("nextjs"),
-                    String::from("typescript"),
-                    String::from("supabase"),
-                ],
                 project_type: String::from("hackathon (waynehacks 3)"),
             },
             ProjectItem {
@@ -214,14 +181,6 @@ impl Projects {
                     String::from(
                         "leverages retrieval‑augmented generation (rag) over the video transcript and the active frame to provide context-aware answers to user prompts during playback",
                     ),
-                ],
-                technologies: vec![
-                    String::from("pinecone"),
-                    String::from("flask"),
-                    String::from("python"),
-                    String::from("javascript"),
-                    String::from("websockets"),
-                    String::from("html/css"),
                 ],
                 project_type: String::from("hackathon (intel ai pc pilot program)"),
             },
@@ -242,15 +201,6 @@ impl Projects {
                     String::from(
                         "3. voice-call interface that simulates talking to a real person, with safe-word detection",
                     ),
-                ],
-                technologies: vec![
-                    String::from("nextjs"),
-                    String::from("typescript"),
-                    String::from("firebase"),
-                    String::from("websocket"),
-                    String::from("retell ai"),
-                    String::from("pythonj"),
-                    String::from("flask"),
                 ],
                 project_type: String::from("hackathon (venushacks 2024)"),
             },

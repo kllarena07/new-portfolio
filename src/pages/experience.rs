@@ -3,9 +3,8 @@ use ratatui::{
     Frame,
     layout::Constraint,
     layout::Rect,
-    prelude::Stylize,
     style::{Color, Style},
-    text::{Line, Span},
+    text::Line,
     widgets::{Block, Cell, Padding, Paragraph, Row, Table, Wrap},
 };
 

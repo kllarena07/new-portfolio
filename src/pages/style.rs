@@ -17,13 +17,6 @@ pub fn white_style() -> Style {
     Style::default().fg(WHITE)
 }
 
-pub fn black_style() -> Style {
-    Style::default().fg(BLACK)
-}
-
-pub fn accent_style() -> Style {
-    Style::default().fg(ACCENT)
-}
 
 pub fn accent_underlined_style() -> Style {
     Style::default().fg(ACCENT).underlined()
@@ -34,18 +27,10 @@ pub fn selected_style() -> Style {
 }
 
 // Span builders for common text patterns
-pub fn gray_span(text: &str) -> Span {
+pub fn gray_span(text: &str) -> Span<'_> {
     Span::styled(text, gray_style())
 }
 
-pub fn white_span(text: &str) -> Span {
+pub fn white_span(text: &str) -> Span<'_> {
     Span::styled(text, white_style())
-}
-
-pub fn accent_span(text: &str) -> Span {
-    Span::styled(text, accent_style())
-}
-
-pub fn accent_underlined_span(text: &str) -> Span {
-    Span::styled(text, accent_underlined_style())
 }

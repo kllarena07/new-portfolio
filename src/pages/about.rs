@@ -1,12 +1,10 @@
 use crate::pages::page::Page;
-use crate::pages::style::{gray_span, white_span, accent_underlined_style, gray_style, selected_style};
+use crate::pages::style::{gray_span, white_span, accent_underlined_style, gray_style};
 use crossterm::event::KeyCode;
 use image::ImageReader;
 use ratatui::{
     Frame,
     layout::Rect,
-    prelude::Stylize,
-    style::{Color, Style},
     text::{Line, Span},
     widgets::canvas::{Canvas, Points},
     widgets::{Block, Padding, Paragraph, Wrap},
