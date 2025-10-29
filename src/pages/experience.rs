@@ -62,7 +62,7 @@ impl Experience {
                     String::from(""),
                     String::from("notable highlights:"),
                     String::from(
-                        "- created a digital enrollment status badge to help reduce Capital One agent call times by 12%",
+                        "- created a digital enrollment status badge to help reduce capital one agent call times by 12%",
                     ),
                 ],
             },
