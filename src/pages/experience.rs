@@ -11,15 +11,15 @@ use crate::pages::page::Page;
 use crate::pages::style::{gray_span, gray_style, line_from_spans, selected_style, white_span};
 
 struct ExperienceItem {
-    role: String,
-    affiliation: String,
-    time: String,
-    description: Vec<String>,
+    role: &'static str,
+    affiliation: &'static str,
+    time: &'static str,
+    description: Vec<&'static str>,
 }
 
 impl ExperienceItem {
-    pub const fn ref_array(&self) -> [&String; 3] {
-        [&self.role, &self.affiliation, &self.time]
+    pub const fn ref_array(&self) -> [&str; 3] {
+        [self.role, self.affiliation, self.time]
     }
 }
 
@@ -32,92 +32,78 @@ impl Experience {
     pub fn new() -> Self {
         let experiences = vec![
             ExperienceItem {
-                role: String::from("swe intern"),
-                affiliation: String::from("capital one"),
-                time: String::from("(jun 2026-aug 2026)"),
-                description: vec![String::from("incoming summer 2026 under the tip program")],
+                role: "swe intern",
+                affiliation: "capital one",
+                time: "(jun 2026-aug 2026)",
+                description: vec!["incoming summer 2026 under the tip program"],
             },
             ExperienceItem {
-                role: String::from("ceo / cto"),
-                affiliation: String::from("ootd"),
-                time: String::from("(mar 2025-oct 2025)"),
+                role: "ceo / cto",
+                affiliation: "ootd",
+                time: "(mar 2025-oct 2025)",
                 description: vec![
-                    String::from(
-                        "led a team of 4 to ship an irl dress to impress mobile app with 260+ users",
-                    ),
-                    String::from(""),
-                    String::from("notable highlights:"),
-                    String::from(
-                        "- achieved a 3x boost in dau retention by analyzing user behavior patterns and implementing targeted push notifications",
-                    ),
+                    "led a team of 4 to ship an irl dress to impress mobile app with 260+ users",
+                    "",
+                    "notable highlights:",
+                    "- achieved a 3x boost in dau retention by analyzing user behavior patterns and implementing targeted push notifications",
                 ],
             },
             ExperienceItem {
-                role: String::from("swe intern"),
-                affiliation: String::from("capital one"),
-                time: String::from("(jun 2025-aug 2025)"),
+                role: "swe intern",
+                affiliation: "capital one",
+                time: "(jun 2025-aug 2025)",
                 description: vec![
-                    String::from("worked on the capital one empath dashboard on a team of 5"),
-                    String::from(""),
-                    String::from("notable highlights:"),
-                    String::from(
-                        "- created a digital enrollment status badge to help reduce capital one agent call times by 12%",
-                    ),
+                    "worked on the capital one empath dashboard on a team of 5",
+                    "",
+                    "notable highlights:",
+                    "- created a digital enrollment status badge to help reduce capital one agent call times by 12%",
                 ],
             },
             ExperienceItem {
-                role: String::from("mobile app dev"),
-                affiliation: String::from("swe, um-dearborn"),
-                time: String::from("(feb 2025-mar 2025)"),
+                role: "mobile app dev",
+                affiliation: "swe, um-dearborn",
+                time: "(feb 2025-mar 2025)",
                 description: vec![
-                    String::from(
-                        "solo developed an event management mobile app for the society of women engineers at the university of michigan-dearborn's power conference",
-                    ),
-                    String::from(""),
-                    String::from(
-                        "features include qr code check-ins and a live agenda, message feed, and push notifications to keep attendees updated",
-                    ),
-                    String::from(""),
-                    String::from("notable highlights:"),
-                    String::from("- deployed to the ios app store as 'power um-d'"),
-                    String::from("- supported 80+ attendees"),
+                    "solo developed an event management mobile app for the society of women engineers at the university of michigan-dearborn's power conference",
+                    "",
+                    "features include qr code check-ins and a live agenda, message feed, and push notifications to keep attendees updated",
+                    "",
+                    "notable highlights:",
+                    "- deployed to the ios app store as 'power um-d'",
+                    "- supported 80+ attendees",
                 ],
             },
             ExperienceItem {
-                role: String::from("frontend dev"),
-                affiliation: String::from("gdsc, um-dearborn"),
-                time: String::from("(nov 2023-dec 2023)"),
+                role: "frontend dev",
+                affiliation: "gdsc, um-dearborn",
+                time: "(nov 2023-dec 2023)",
                 description: vec![
-                    String::from("built the michigan devfest 2023 website on a team of 8"),
-                    String::from(""),
-                    String::from("notable highlights:"),
-                    String::from("- website drove 300+ event attendees"),
+                    "built the michigan devfest 2023 website on a team of 8",
+                    "",
+                    "notable highlights:",
+                    "- website drove 300+ event attendees",
                 ],
             },
             ExperienceItem {
-                role: String::from("fullstack dev"),
-                affiliation: String::from("adhd magazine"),
-                time: String::from("(may 2023-aug 2023)"),
+                role: "fullstack dev",
+                affiliation: "adhd magazine",
+                time: "(may 2023-aug 2023)",
                 description: vec![
-                    String::from(
-                        "designed a blog platform to showcase detroit's underground culture",
-                    ),
-                    String::from(""),
-                    String::from("notable highlights:"),
-                    String::from("- engaged an audience of 2500+ followers"),
+                    "designed a blog platform to showcase detroit's underground culture",
+                    "",
+                    "notable highlights:",
+                    "- engaged an audience of 2500+ followers",
                 ],
             },
             ExperienceItem {
-                role: String::from("incubatee"),
-                affiliation: String::from("ai camp"),
-                time: String::from("(sep 2022-nov 2022)"),
+                role: "incubatee",
+                affiliation: "ai camp",
+                time: "(sep 2022-nov 2022)",
                 description: vec![
-                    String::from(
-                        "created gpt-3 wrapper that summarized videos, audio, and text as part of the 2023 ai camp incubator program",
-                    ),
-                    String::from(""),
-                    String::from("notable highlights:"),
-                    String::from("- won $500 by placing 2nd place out of 21 other teams"),
+                    "created gpt-3 wrapper that summarized videos, audio, and text as part of the 2023 ai camp incubator program",
+                    "",
+                    "notable highlights:",
+                    "- won $500 by placing 2nd place out of 21 other teams",
                 ],
             },
         ];
@@ -174,7 +160,7 @@ impl Page for Experience {
             };
 
             item.into_iter()
-                .map(|content| Cell::from(content.as_str()))
+                .map(|content| Cell::from(content))
                 .collect::<Row>()
                 .style(style_config)
                 .height(1)

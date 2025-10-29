@@ -11,15 +11,15 @@ use crate::pages::page::Page;
 use crate::pages::style::{gray_span, gray_style, line_from_spans, selected_style, white_span};
 
 struct ExperienceItem {
-    role: String,
-    affiliation: String,
-    time: String,
-    description: Vec<String>,
+    role: &'static str,
+    affiliation: &'static str,
+    time: &'static str,
+    description: Vec<&'static str>,
 }
 
 impl ExperienceItem {
-    pub const fn ref_array(&self) -> [&String; 3] {
-        [&self.role, &self.affiliation, &self.time]
+    pub const fn ref_array(&self) -> [&str; 3] {
+        [self.role, self.affiliation, self.time]
     }
 }
 
@@ -32,32 +32,26 @@ impl Leadership {
     pub fn new() -> Self {
         let experiences = vec![
             ExperienceItem {
-                role: String::from("ceo"),
-                affiliation: String::from("filipino americans in tech"),
-                time: String::from("(oct 2024-present)"),
+                role: "ceo",
+                affiliation: "filipino americans in tech",
+                time: "(oct 2024-present)",
                 description: vec![
-                    String::from(
-                        "building the largest network of filipino tech professionals to help make tech more accessible for filipinos. currently at 263 members",
-                    ),
-                    String::from(""),
-                    String::from("notable highlights:"),
-                    String::from("- collaborated amazon, dreamhaven, and aapi in gaming"),
-                    String::from(
-                        "- organized a hackathon to help filipino businesses that was sponsored by vercel, warp, and sorce (yc f25)",
-                    ),
+                    "building the largest network of filipino tech professionals to help make tech more accessible for filipinos. currently at 263 members",
+                    "",
+                    "notable highlights:",
+                    "- collaborated amazon, dreamhaven, and aapi in gaming",
+                    "- organized a hackathon to help filipino businesses that was sponsored by vercel, warp, and sorce (yc f25)",
                 ],
             },
             ExperienceItem {
-                role: String::from("coo"),
-                affiliation: String::from("wecracked"),
-                time: String::from("(may 2024-jul 2024)"),
+                role: "coo",
+                affiliation: "wecracked",
+                time: "(may 2024-jul 2024)",
                 description: vec![
-                    String::from("built a 6,000+ member hackathon community"),
-                    String::from(""),
-                    String::from("notable highlights:"),
-                    String::from(
-                        "- secured $2k in sponsorship backing from companies like koyeb and tensordock",
-                    ),
+                    "built a 6,000+ member hackathon community",
+                    "",
+                    "notable highlights:",
+                    "- secured $2k in sponsorship backing from companies like koyeb and tensordock",
                 ],
             },
         ];
@@ -114,7 +108,7 @@ impl Page for Leadership {
             };
 
             item.into_iter()
-                .map(|content| Cell::from(content.as_str()))
+                .map(|content| Cell::from(content))
                 .collect::<Row>()
                 .style(style_config)
                 .height(1)
