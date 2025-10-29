@@ -1,5 +1,4 @@
 use crossterm::event::KeyCode;
-use image::ImageReader;
 use ratatui::{
     DefaultTerminal, Frame,
     layout::{Constraint, Flex, Layout},
@@ -8,108 +7,18 @@ use ratatui::{
     text::Span,
     widgets::{Block, Borders, List, ListItem, Padding},
 };
-use std::fs;
 use std::{io, sync::mpsc, thread, time::Duration};
 
 mod pages;
 use pages::{about::About, page::Page};
 
-fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
-    const LIMIT_TO_10_FRAMES: bool = true; // Set to true to only load first 10 frames
-    let mut all_frames = Vec::new();
-
-    // Read all frame files from hikari directory
-    let mut frame_files = Vec::new();
-    if let Ok(entries) = fs::read_dir("./hikari-dance") {
-        for entry in entries {
-            if let Ok(entry) = entry {
-                let path = entry.path();
-                if let Some(extension) = path.extension() {
-                    if extension == "png" || extension == "jpg" || extension == "jpeg" {
-                        if let Some(_file_name) = path.file_name() {
-                            frame_files.push(path.clone());
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // Sort the files numerically by extracting frame numbers
-    frame_files.sort_by(|a, b| {
-        let extract_frame_number = |path: &std::path::PathBuf| -> i32 {
-            path.file_stem()
-                .and_then(|stem| stem.to_str())
-                .and_then(|name| name.strip_prefix("frame_"))
-                .and_then(|num_str| num_str.parse::<i32>().ok())
-                .unwrap_or(0)
-        };
-
-        let a_num = extract_frame_number(a);
-        let b_num = extract_frame_number(b);
-        a_num.cmp(&b_num)
-    });
-
-    // Debug: Print first few frame names to verify ordering
-    println!("Frame loading order (first 10):");
-    for (i, path) in frame_files.iter().take(10).enumerate() {
-        println!("{}: {}", i, path.file_name().unwrap().to_string_lossy());
-    }
-
-    // Process each frame
-    let frames_to_process = if LIMIT_TO_10_FRAMES {
-        frame_files.into_iter().take(10).collect()
-    } else {
-        frame_files
-    };
-
-    for frame_path in frames_to_process {
-        if let Ok(img) = ImageReader::open(&frame_path) {
-            if let Ok(decoded_img) = img.decode() {
-                // Resize to square dimensions
-                let resized_img =
-                    decoded_img.resize(112, 112, image::imageops::FilterType::Lanczos3);
-                let rgb_img = resized_img.to_rgb8();
-                let (width, height) = rgb_img.dimensions();
-
-                // Create 2D array to store RGB values for this frame
-                let mut pixel_rgb_val_map: Vec<Vec<[u8; 3]>> = Vec::with_capacity(height as usize);
-
-                for y in 0..height {
-                    let mut row: Vec<[u8; 3]> = Vec::with_capacity(width as usize);
-                    for x in 0..width {
-                        let pixel = rgb_img.get_pixel(x, y);
-                        row.push([pixel[0], pixel[1], pixel[2]]);
-                    }
-                    pixel_rgb_val_map.push(row);
-                }
-
-                all_frames.push(pixel_rgb_val_map);
-            }
-        }
-    }
-
-    all_frames
-}
-
 fn main() -> io::Result<()> {
-    let all_frames = get_all_frames_rgb_vals();
-    let max_frames = all_frames.len();
-    println!(
-        "width: {}, height: {}",
-        all_frames[0][0].len(),
-        all_frames[0].len()
-    );
-
     let pages: Vec<Box<dyn Page>> = vec![Box::new(About::new())];
 
     let mut app = App {
         running: true,
         selected_page: 0,
-        frame_number: 0,
         pages,
-        all_frames,
-        max_frames,
     };
 
     let mut terminal = ratatui::init();
@@ -122,9 +31,8 @@ fn main() -> io::Result<()> {
     });
 
     let tx_to_counter_events = event_tx.clone();
-    let max_frames_for_thread = max_frames;
     thread::spawn(move || {
-        run_background_thread(tx_to_counter_events, max_frames_for_thread);
+        run_tick_thread(tx_to_counter_events, 30);
     });
 
     let app_result = app.run(&mut terminal, event_rx);
@@ -135,7 +43,7 @@ fn main() -> io::Result<()> {
 
 enum Event {
     Input(crossterm::event::KeyEvent),
-    Counter(usize),
+    Tick(u64),
 }
 
 fn handle_input_events(tx: mpsc::Sender<Event>) {
@@ -147,25 +55,20 @@ fn handle_input_events(tx: mpsc::Sender<Event>) {
     }
 }
 
-fn run_background_thread(tx: mpsc::Sender<Event>, max_frames: usize) {
-    let framerate = 30;
-    let frame_duration = Duration::from_millis(1000 / framerate);
-
+fn run_tick_thread(tx: mpsc::Sender<Event>, fps: u64) {
+    let frame_duration = Duration::from_millis(1000 / fps);
+    let mut tick: u64 = 0;
     loop {
-        for count in 0..max_frames {
-            tx.send(Event::Counter(count)).unwrap();
-            thread::sleep(frame_duration);
-        }
+        tx.send(Event::Tick(tick)).unwrap();
+        tick = tick.wrapping_add(1);
+        thread::sleep(frame_duration);
     }
 }
 
 struct App {
     running: bool,
     selected_page: usize,
-    frame_number: usize,
-    max_frames: usize,
     pages: Vec<Box<dyn Page>>,
-    all_frames: Vec<Vec<Vec<[u8; 3]>>>,
 }
 
 impl App {
@@ -173,7 +76,11 @@ impl App {
         while self.running {
             match rx.recv().unwrap() {
                 Event::Input(key_event) => self.handle_key_event(key_event)?,
-                Event::Counter(count) => self.frame_number = count,
+                Event::Tick(tick) => {
+                    if let Some(page) = self.pages.get_mut(self.selected_page) {
+                        let _ = page.on_tick(tick);
+                    }
+                }
             }
 
             terminal.draw(|frame| self.draw(frame))?;
@@ -183,14 +90,6 @@ impl App {
     }
 
     fn draw(&mut self, frame: &mut Frame) {
-        if self.all_frames.is_empty() {
-            return;
-        }
-
-        // Get the current frame based on the counter
-        let current_frame_index = self.frame_number % self.max_frames;
-        let current_frame = &self.all_frames[current_frame_index];
-
         let [vertical_area] = Layout::vertical([Constraint::Percentage(35)])
             .flex(Flex::Center)
             .areas(frame.area());

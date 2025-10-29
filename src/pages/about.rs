@@ -1,5 +1,6 @@
 use crate::pages::page::Page;
 use crossterm::event::KeyCode;
+use image::ImageReader;
 use ratatui::{
     Frame,
     layout::Rect,
@@ -9,6 +10,7 @@ use ratatui::{
     widgets::canvas::{Canvas, Points},
     widgets::{Block, Padding, Paragraph, Wrap},
 };
+use std::fs;
 
 #[derive(Clone)]
 pub struct ContactLink<'a> {
@@ -21,6 +23,9 @@ pub struct About<'a> {
     state: usize,
     current_link: String,
     links: Vec<ContactLink<'a>>,
+    all_frames: Vec<Vec<Vec<[u8; 3]>>>,
+    max_frames: usize,
+    tick: u64,
 }
 
 impl<'a> Page for About<'a> {
@@ -156,30 +161,37 @@ impl<'a> Page for About<'a> {
     }
 
     fn render_additional(&self, frame: &mut Frame, area: Rect) {
-        let canvas_width = area.width as f64;
-        let canvas_height = (area.height * 2) as f64; // HalfBlock doubles vertical resolution
+        if self.max_frames == 0 || self.all_frames.is_empty() {
+            return;
+        }
 
-        Canvas::default()
+        let idx = (self.tick as usize) % self.max_frames;
+        let current_frame = &self.all_frames[idx];
+        let frame_height = current_frame.len() as f64;
+        if frame_height == 0.0 {
+            return;
+        }
+        let frame_width = current_frame[0].len() as f64;
+        let y_max = frame_height * 2.0; // HalfBlock doubles vertical resolution
+
+        let canvas = Canvas::default()
             .marker(ratatui::symbols::Marker::HalfBlock)
-            .x_bounds([0.0, canvas_width])
-            .y_bounds([0.0, canvas_height])
+            .x_bounds([0.0, frame_width])
+            .y_bounds([0.0, y_max])
             .paint(|ctx| {
-                // Stretch the 112x112 frame to fill the entire canvas area
-                let frame_width = 112.0;
-                let frame_height = 112.0;
-                // Draw pixels from the current frame, mapping each pixel to fill the canvas
                 for (y, row) in current_frame.iter().enumerate() {
+                    let y_top = y_max - (y as f64 * 2.0);
                     for (x, pixel) in row.iter().enumerate() {
-                        // Map frame coordinates directly to canvas coordinates
-                        let canvas_x = (x as f64 / frame_width) * canvas_width;
-                        let canvas_y = canvas_height - ((y as f64 / frame_height) * canvas_height);
+                        let x_f = x as f64;
                         ctx.draw(&Points {
-                            coords: &[(canvas_x, canvas_y)],
+                            coords: &[(x_f, y_top)],
                             color: ratatui::style::Color::Rgb(pixel[0], pixel[1], pixel[2]),
                         });
                     }
                 }
             });
+
+        frame.render_widget(canvas, area);
     }
 
     fn keyboard_event_handler(&mut self, key_code: KeyCode) -> bool {
@@ -198,6 +210,11 @@ impl<'a> Page for About<'a> {
             }
             _ => false,
         }
+    }
+
+    fn on_tick(&mut self, tick: u64) -> bool {
+        self.tick = tick;
+        true
     }
 }
 
@@ -222,11 +239,17 @@ impl<'a> About<'a> {
             },
         ];
 
+        let all_frames = get_all_frames_rgb_vals();
+        let max_frames = all_frames.len();
+
         Self {
             name: String::from("about"),
             state: 0,
             current_link: String::from(links[0].link),
             links,
+            all_frames,
+            max_frames,
+            tick: 0,
         }
     }
 
@@ -247,4 +270,82 @@ impl<'a> About<'a> {
     fn change_current_link(&mut self) {
         self.current_link = String::from(self.links[self.state].link);
     }
+}
+
+fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
+    const LIMIT_TO_10_FRAMES: bool = true; // Set to true to only load first 10 frames
+    let mut all_frames = Vec::new();
+
+    // Read all frame files from hikari directory
+    let mut frame_files = Vec::new();
+    if let Ok(entries) = fs::read_dir("./hikari-dance") {
+        for entry in entries {
+            if let Ok(entry) = entry {
+                let path = entry.path();
+                if let Some(extension) = path.extension() {
+                    if extension == "png" || extension == "jpg" || extension == "jpeg" {
+                        if let Some(_file_name) = path.file_name() {
+                            frame_files.push(path.clone());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Sort the files numerically by extracting frame numbers
+    frame_files.sort_by(|a, b| {
+        let extract_frame_number = |path: &std::path::PathBuf| -> i32 {
+            path.file_stem()
+                .and_then(|stem| stem.to_str())
+                .and_then(|name| name.strip_prefix("frame_"))
+                .and_then(|num_str| num_str.parse::<i32>().ok())
+                .unwrap_or(0)
+        };
+
+        let a_num = extract_frame_number(a);
+        let b_num = extract_frame_number(b);
+        a_num.cmp(&b_num)
+    });
+
+    // Debug: Print first few frame names to verify ordering
+    println!("Frame loading order (first 10):");
+    for (i, path) in frame_files.iter().take(10).enumerate() {
+        println!("{}: {}", i, path.file_name().unwrap().to_string_lossy());
+    }
+
+    // Process each frame
+    let frames_to_process = if LIMIT_TO_10_FRAMES {
+        frame_files.into_iter().take(10).collect()
+    } else {
+        frame_files
+    };
+
+    for frame_path in frames_to_process {
+        if let Ok(img) = ImageReader::open(&frame_path) {
+            if let Ok(decoded_img) = img.decode() {
+                // Resize to square dimensions
+                let resized_img =
+                    decoded_img.resize(112, 112, image::imageops::FilterType::Lanczos3);
+                let rgb_img = resized_img.to_rgb8();
+                let (width, height) = rgb_img.dimensions();
+
+                // Create 2D array to store RGB values for this frame
+                let mut pixel_rgb_val_map: Vec<Vec<[u8; 3]>> = Vec::with_capacity(height as usize);
+
+                for y in 0..height {
+                    let mut row: Vec<[u8; 3]> = Vec::with_capacity(width as usize);
+                    for x in 0..width {
+                        let pixel = rgb_img.get_pixel(x, y);
+                        row.push([pixel[0], pixel[1], pixel[2]]);
+                    }
+                    pixel_rgb_val_map.push(row);
+                }
+
+                all_frames.push(pixel_rgb_val_map);
+            }
+        }
+    }
+
+    all_frames
 }
