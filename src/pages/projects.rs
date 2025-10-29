@@ -55,7 +55,7 @@ impl Page for Projects {
                 .height(1)
         });
 
-        let table = Table::new(rows, [Constraint::Fill(1), Constraint::Fill(1)])
+        let table = Table::new(rows, [Constraint::Fill(1), Constraint::Fill(2)])
             .header(header)
             .block(Block::new().padding(Padding {
                 left: 1,
