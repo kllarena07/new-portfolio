@@ -1,5 +1,5 @@
 use crate::pages::page::Page;
-use crate::pages::style::{gray_span, white_span, accent_underlined_style, gray_style};
+use crate::pages::style::{accent_underlined_style, gray_span, gray_style, white_span};
 use crossterm::event::KeyCode;
 use image::ImageReader;
 use ratatui::{

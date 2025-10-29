@@ -89,108 +89,82 @@ impl Experience {
     fn get_description(&self) -> Vec<Line<'_>> {
         match self.state {
             0 => {
-                vec![Line::from(vec![
-                    gray_span("incoming summer 2026 under the tip program"),
-                ])]
+                vec![Line::from(vec![gray_span(
+                    "incoming summer 2026 under the tip program",
+                )])]
             }
             1 => {
                 vec![
-                    Line::from(
-                        vec![
-                            gray_span("led a team of 4 to ship an irl dress to impress mobile app with 260+ users"),
-                        ]
-                        ),
+                    Line::from(vec![gray_span(
+                        "led a team of 4 to ship an irl dress to impress mobile app with 260+ users",
+                    )]),
                     Line::from(""),
-                    Line::from(vec![
-                        gray_span("notable highlights:"),
-                    ]),
-                    Line::from(vec![
-                        gray_span("- achieved a 3x boost in dau retention by analyzing user behavior patterns and implementing targeted push notifications"),
-                    ])
+                    Line::from(vec![gray_span("notable highlights:")]),
+                    Line::from(vec![gray_span(
+                        "- achieved a 3x boost in dau retention by analyzing user behavior patterns and implementing targeted push notifications",
+                    )]),
                 ]
             }
             2 => {
                 vec![
-                    Line::from(
-                        vec![
-                            gray_span("worked on the capital one empath dashboard on a team of 5"),
-                        ]
-                        ),
+                    Line::from(vec![gray_span(
+                        "worked on the capital one empath dashboard on a team of 5",
+                    )]),
                     Line::from(""),
-                    Line::from(vec![
-                        gray_span("notable highlights:"),
-                    ]),
-                    Line::from(
-                        vec![
-                            gray_span("- created a digital enrollment status badge to help reduce Capital One agent call times by 12%"),
-                        ]
-                        )
+                    Line::from(vec![gray_span("notable highlights:")]),
+                    Line::from(vec![gray_span(
+                        "- created a digital enrollment status badge to help reduce Capital One agent call times by 12%",
+                    )]),
                 ]
             }
             3 => {
                 vec![
-                    Line::from(
-                        vec![
-                            gray_span("solo developed an event management mobile app for the society of women engineers at the university of michigan-dearborn's power conference"),
-                        ]
-                        ),
+                    Line::from(vec![gray_span(
+                        "solo developed an event management mobile app for the society of women engineers at the university of michigan-dearborn's power conference",
+                    )]),
                     Line::from(""),
-                    Line::from(
-                        vec![
-                            gray_span("features include qr code check-ins and a live agenda, message feed, and push notifications to keep attendees updated"),
-                        ]
-                        ),
+                    Line::from(vec![gray_span(
+                        "features include qr code check-ins and a live agenda, message feed, and push notifications to keep attendees updated",
+                    )]),
                     Line::from(""),
-                    Line::from(vec![
-                        gray_span("notable highlights:"),
-                    ]),
-                    Line::from(vec![
-                        gray_span("- deployed to the ios app store as 'power um-d'"),
-                    ]),
-                    Line::from(vec![
-                        gray_span("- supported 80+ attendees"),
-                    ])
+                    Line::from(vec![gray_span("notable highlights:")]),
+                    Line::from(vec![gray_span(
+                        "- deployed to the ios app store as 'power um-d'",
+                    )]),
+                    Line::from(vec![gray_span("- supported 80+ attendees")]),
                 ]
             }
             4 => {
                 vec![
-                    Line::from(vec![
-                        gray_span("built the michigan devfest 2023 website on a team of 8"),
-                    ]),
+                    Line::from(vec![gray_span(
+                        "built the michigan devfest 2023 website on a team of 8",
+                    )]),
                     Line::from(""),
-                    Line::from(vec![
-                        gray_span("notable highlights:"),
-                    ]),
-                    Line::from(vec![
-                        gray_span("- website drove 300+ event attendees"),
-                    ]),
+                    Line::from(vec![gray_span("notable highlights:")]),
+                    Line::from(vec![gray_span("- website drove 300+ event attendees")]),
                 ]
             }
             5 => {
                 vec![
-                    Line::from(vec![
-                        gray_span("designed a blog platform to showcase detroit's underground culture"),
-                    ]),
+                    Line::from(vec![gray_span(
+                        "designed a blog platform to showcase detroit's underground culture",
+                    )]),
                     Line::from(""),
-                    Line::from(vec![
-                        gray_span("notable highlights:"),
-                    ]),
-                    Line::from(vec![
-                        gray_span("- engaged an audience of 2500+ followers"),
-                    ]),
+                    Line::from(vec![gray_span("notable highlights:")]),
+                    Line::from(vec![gray_span("- engaged an audience of 2500+ followers")]),
                 ]
             }
             6 => {
-                vec![Line::from(vec![
-                    gray_span("created gpt-3 wrapper that summarized videos, audio, and text as part of the 2023 ai camp incubator program"),
-                ]),
-                Line::from(""),
-                Line::from(vec![
-                    gray_span("notable highlights:"),
-                ]),
-                Line::from(vec![
-                    gray_span("- won $500 by placing 2nd place out of 21 other teams"),
-                ]),]
+                vec![
+                    Line::from(vec![gray_span(
+                        "created gpt-3 wrapper that summarized videos, audio, and text as part of the 2023 ai camp incubator program",
+                    )]),
+                    Line::from(""),
+                    Line::from(vec![gray_span("notable highlights:")]),
+                    Line::from(vec![gray_span(
+                        "- won $500 by placing 2nd place out of 21 other teams",
+                    )]),
+                ]
             }
             _ => vec![],
         }

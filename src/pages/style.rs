@@ -17,7 +17,6 @@ pub fn white_style() -> Style {
     Style::default().fg(WHITE)
 }
 
-
 pub fn accent_underlined_style() -> Style {
     Style::default().fg(ACCENT).underlined()
 }
