@@ -8,7 +8,7 @@ use ratatui::{
 };
 
 use crate::pages::page::Page;
-use crate::pages::style::{gray_span, selected_style, white_span};
+use crate::pages::style::{gray_span, line_from_spans, selected_style, white_span};
 
 struct ProjectItem {
     name: String,
@@ -215,7 +215,7 @@ impl Projects {
         let project_item = &self.projects[project_index];
 
         for prize in &project_item.prizes {
-            final_vec.push(Line::from(vec![gray_span(&prize)]));
+            final_vec.push(line_from_spans(vec![gray_span(&prize)]));
         }
 
         if project_item.prizes.len() > 0 {
@@ -223,7 +223,7 @@ impl Projects {
         }
 
         for desc_part in &project_item.description {
-            final_vec.push(Line::from(vec![gray_span(&desc_part)]));
+            final_vec.push(line_from_spans(vec![gray_span(&desc_part)]));
         }
 
         final_vec

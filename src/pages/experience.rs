@@ -9,7 +9,7 @@ use ratatui::{
 };
 
 use crate::pages::page::Page;
-use crate::pages::style::{gray_span, selected_style, white_span};
+use crate::pages::style::{gray_span, line_from_spans, selected_style, white_span};
 
 struct ExperienceItem {
     role: String,
@@ -147,7 +147,7 @@ impl Experience {
         let experience_item = &self.experiences[experience_index];
 
         for desc_part in &experience_item.description {
-            final_vec.push(Line::from(vec![gray_span(&desc_part)]));
+            final_vec.push(line_from_spans(vec![gray_span(&desc_part)]));
         }
 
         final_vec

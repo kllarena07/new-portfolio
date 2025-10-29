@@ -1,6 +1,6 @@
 use ratatui::prelude::Stylize;
 use ratatui::style::{Color, Style};
-use ratatui::text::Span;
+use ratatui::text::{Line, Span};
 
 // Color constants
 pub const WHITE: Color = Color::Rgb(255, 255, 255);
@@ -32,4 +32,9 @@ pub fn gray_span(text: &str) -> Span<'_> {
 
 pub fn white_span(text: &str) -> Span<'_> {
     Span::styled(text, white_style())
+}
+
+// Line builder from spans
+pub fn line_from_spans(spans: Vec<Span<'_>>) -> Line<'_> {
+    Line::from(spans)
 }
