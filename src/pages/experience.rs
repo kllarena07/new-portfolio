@@ -15,6 +15,7 @@ struct ExperienceItem {
     role: String,
     affiliation: String,
     time: String,
+    description: Vec<String>,
 }
 
 impl ExperienceItem {
@@ -35,36 +36,90 @@ impl Experience {
                 role: String::from("swe intern"),
                 affiliation: String::from("capital one"),
                 time: String::from("(jun 2026-aug 2026)"),
+                description: vec![String::from("incoming summer 2026 under the tip program")],
             },
             ExperienceItem {
                 role: String::from("ceo / cto"),
                 affiliation: String::from("ootd"),
                 time: String::from("(mar 2025-oct 2025)"),
+                description: vec![
+                    String::from(
+                        "led a team of 4 to ship an irl dress to impress mobile app with 260+ users",
+                    ),
+                    String::from(""),
+                    String::from("notable highlights:"),
+                    String::from(
+                        "- achieved a 3x boost in dau retention by analyzing user behavior patterns and implementing targeted push notifications",
+                    ),
+                ],
             },
             ExperienceItem {
                 role: String::from("swe intern"),
                 affiliation: String::from("capital one"),
                 time: String::from("(jun 2025-aug 2025)"),
+                description: vec![
+                    String::from("worked on the capital one empath dashboard on a team of 5"),
+                    String::from(""),
+                    String::from("notable highlights:"),
+                    String::from(
+                        "- created a digital enrollment status badge to help reduce Capital One agent call times by 12%",
+                    ),
+                ],
             },
             ExperienceItem {
                 role: String::from("mobile app dev"),
                 affiliation: String::from("swe, um-dearborn"),
                 time: String::from("(feb 2025-mar 2025)"),
+                description: vec![
+                    String::from(
+                        "solo developed an event management mobile app for the society of women engineers at the university of michigan-dearborn's power conference",
+                    ),
+                    String::from(""),
+                    String::from(
+                        "features include qr code check-ins and a live agenda, message feed, and push notifications to keep attendees updated",
+                    ),
+                    String::from(""),
+                    String::from("notable highlights:"),
+                    String::from("- deployed to the ios app store as 'power um-d'"),
+                    String::from("- supported 80+ attendees"),
+                ],
             },
             ExperienceItem {
                 role: String::from("frontend dev"),
                 affiliation: String::from("gdsc, um-dearborn"),
                 time: String::from("(nov 2023-dec 2023)"),
+                description: vec![
+                    String::from("built the michigan devfest 2023 website on a team of 8"),
+                    String::from(""),
+                    String::from("notable highlights:"),
+                    String::from("- website drove 300+ event attendees"),
+                ],
             },
             ExperienceItem {
                 role: String::from("fullstack dev"),
                 affiliation: String::from("adhd magazine"),
                 time: String::from("(may 2023-aug 2023)"),
+                description: vec![
+                    String::from(
+                        "designed a blog platform to showcase detroit's underground culture",
+                    ),
+                    String::from(""),
+                    String::from("notable highlights:"),
+                    String::from("- engaged an audience of 2500+ followers"),
+                ],
             },
             ExperienceItem {
                 role: String::from("incubatee"),
                 affiliation: String::from("ai camp"),
                 time: String::from("(sep 2022-nov 2022)"),
+                description: vec![
+                    String::from(
+                        "created gpt-3 wrapper that summarized videos, audio, and text as part of the 2023 ai camp incubator program",
+                    ),
+                    String::from(""),
+                    String::from("notable highlights:"),
+                    String::from("- won $500 by placing 2nd place out of 21 other teams"),
+                ],
             },
         ];
 
@@ -87,87 +142,15 @@ impl Experience {
     }
 
     fn get_description(&self) -> Vec<Line<'_>> {
-        match self.state {
-            0 => {
-                vec![Line::from(vec![gray_span(
-                    "incoming summer 2026 under the tip program",
-                )])]
-            }
-            1 => {
-                vec![
-                    Line::from(vec![gray_span(
-                        "led a team of 4 to ship an irl dress to impress mobile app with 260+ users",
-                    )]),
-                    Line::from(""),
-                    Line::from(vec![gray_span("notable highlights:")]),
-                    Line::from(vec![gray_span(
-                        "- achieved a 3x boost in dau retention by analyzing user behavior patterns and implementing targeted push notifications",
-                    )]),
-                ]
-            }
-            2 => {
-                vec![
-                    Line::from(vec![gray_span(
-                        "worked on the capital one empath dashboard on a team of 5",
-                    )]),
-                    Line::from(""),
-                    Line::from(vec![gray_span("notable highlights:")]),
-                    Line::from(vec![gray_span(
-                        "- created a digital enrollment status badge to help reduce Capital One agent call times by 12%",
-                    )]),
-                ]
-            }
-            3 => {
-                vec![
-                    Line::from(vec![gray_span(
-                        "solo developed an event management mobile app for the society of women engineers at the university of michigan-dearborn's power conference",
-                    )]),
-                    Line::from(""),
-                    Line::from(vec![gray_span(
-                        "features include qr code check-ins and a live agenda, message feed, and push notifications to keep attendees updated",
-                    )]),
-                    Line::from(""),
-                    Line::from(vec![gray_span("notable highlights:")]),
-                    Line::from(vec![gray_span(
-                        "- deployed to the ios app store as 'power um-d'",
-                    )]),
-                    Line::from(vec![gray_span("- supported 80+ attendees")]),
-                ]
-            }
-            4 => {
-                vec![
-                    Line::from(vec![gray_span(
-                        "built the michigan devfest 2023 website on a team of 8",
-                    )]),
-                    Line::from(""),
-                    Line::from(vec![gray_span("notable highlights:")]),
-                    Line::from(vec![gray_span("- website drove 300+ event attendees")]),
-                ]
-            }
-            5 => {
-                vec![
-                    Line::from(vec![gray_span(
-                        "designed a blog platform to showcase detroit's underground culture",
-                    )]),
-                    Line::from(""),
-                    Line::from(vec![gray_span("notable highlights:")]),
-                    Line::from(vec![gray_span("- engaged an audience of 2500+ followers")]),
-                ]
-            }
-            6 => {
-                vec![
-                    Line::from(vec![gray_span(
-                        "created gpt-3 wrapper that summarized videos, audio, and text as part of the 2023 ai camp incubator program",
-                    )]),
-                    Line::from(""),
-                    Line::from(vec![gray_span("notable highlights:")]),
-                    Line::from(vec![gray_span(
-                        "- won $500 by placing 2nd place out of 21 other teams",
-                    )]),
-                ]
-            }
-            _ => vec![],
+        let experience_index = self.state;
+        let mut final_vec: Vec<Line<'_>> = vec![];
+        let experience_item = &self.experiences[experience_index];
+
+        for desc_part in &experience_item.description {
+            final_vec.push(Line::from(vec![gray_span(&desc_part)]));
         }
+
+        final_vec
     }
 }
 

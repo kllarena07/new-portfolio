@@ -15,6 +15,7 @@ struct ExperienceItem {
     role: String,
     affiliation: String,
     time: String,
+    description: Vec<String>,
 }
 
 impl ExperienceItem {
@@ -35,11 +36,30 @@ impl Leadership {
                 role: String::from("ceo"),
                 affiliation: String::from("filipino americans in tech"),
                 time: String::from("(oct 2024-present)"),
+                description: vec![
+                    String::from(
+                        "building the largest network of filipino tech professionals to help make tech more accessible for filipinos. currently at 263 members",
+                    ),
+                    String::from(""),
+                    String::from("notable highlights:"),
+                    String::from("- collaborated amazon, dreamhaven, and aapi in gaming"),
+                    String::from(
+                        "- organized a hackathon to help filipino businesses that was sponsored by vercel, warp, and sorce (yc f25)",
+                    ),
+                ],
             },
             ExperienceItem {
                 role: String::from("coo"),
                 affiliation: String::from("wecracked"),
                 time: String::from("(may 2024-jul 2024)"),
+                description: vec![
+                    String::from("built a 6,000+ member hackathon community"),
+                    String::from(""),
+                    String::from("notable highlights:"),
+                    String::from(
+                        "- secured $2k in sponsorship backing from companies like koyeb and tensordock",
+                    ),
+                ],
             },
         ];
 
@@ -62,34 +82,15 @@ impl Leadership {
     }
 
     fn get_description(&self) -> Vec<Line<'_>> {
-        match self.state {
-            0 => {
-                vec![
-                    Line::from(gray_span(
-                        "building the largest network of filipino tech professionals to help make tech more accessible for filipinos. currently at 263 members",
-                    )),
-                    Line::from(""),
-                    Line::from(gray_span("notable highlights:")),
-                    Line::from(gray_span(
-                        "- collaborated amazon, dreamhaven, and aapi in gaming",
-                    )),
-                    Line::from(gray_span(
-                        "- organized a hackathon to help filipino businesses that was sponsored by vercel, warp, and sorce (yc f25)",
-                    )),
-                ]
-            }
-            1 => {
-                vec![
-                    Line::from(gray_span("built a 6,000+ member hackathon community")),
-                    Line::from(""),
-                    Line::from(gray_span("notable highlights:")),
-                    Line::from(gray_span(
-                        "- secured $2k in sponsorship backing from companies like koyeb and tensordock",
-                    )),
-                ]
-            }
-            _ => vec![],
+        let experience_index = self.state;
+        let mut final_vec: Vec<Line<'_>> = vec![];
+        let experience_item = &self.experiences[experience_index];
+
+        for desc_part in &experience_item.description {
+            final_vec.push(Line::from(vec![gray_span(&desc_part)]));
         }
+
+        final_vec
     }
 }
 
