@@ -202,7 +202,7 @@ impl Page for Experience {
 
     fn render_additional(&self, frame: &mut Frame, area: Rect) {
         let mut description = self.get_description();
-        description.insert(0, Line::from(vec![white_span("desc")]));
+        description.insert(0, line_from_spans(vec![white_span("desc")]));
 
         let paragraph = Paragraph::new(description).wrap(Wrap { trim: true });
         frame.render_widget(paragraph, area);

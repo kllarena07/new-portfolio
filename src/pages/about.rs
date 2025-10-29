@@ -1,5 +1,7 @@
 use crate::pages::page::Page;
-use crate::pages::style::{accent_underlined_style, gray_span, gray_style, white_span};
+use crate::pages::style::{
+    accent_underlined_style, gray_span, gray_style, line_from_spans, white_span,
+};
 use crossterm::event::KeyCode;
 use image::ImageReader;
 use ratatui::{
@@ -32,36 +34,36 @@ impl<'a> Page for About<'a> {
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) {
-        let line_1 = Line::from(vec![
+        let line_1 = line_from_spans(vec![
             gray_span("hey! my name is "),
             white_span("kieran llarena"),
         ]);
 
-        let line_2 = Line::from(vec![
+        let line_2 = line_from_spans(vec![
             gray_span("im currently studying "),
             white_span("computer science "),
             gray_span("at the "),
             white_span("university of michigan-dearborn"),
         ]);
 
-        let line_3 = Line::from(vec![
+        let line_3 = line_from_spans(vec![
             gray_span("my expected graduation date is "),
             white_span("may 2027"),
         ]);
 
-        let line_4 = Line::from(vec![
+        let line_4 = line_from_spans(vec![
             gray_span("i thrive best in environments that value "),
             white_span("high velocity "),
             gray_span("and "),
             white_span("strong ownership"),
         ]);
 
-        let line_5 = Line::from(vec![
+        let line_5 = line_from_spans(vec![
             gray_span("my background is rooted in "),
             white_span("web and mobile fullstack development"),
         ]);
 
-        let line_6 = Line::from(vec![
+        let line_6 = line_from_spans(vec![
             gray_span("im currently exploring "),
             white_span("systems programming"),
             gray_span(", specifically working with "),
@@ -85,7 +87,7 @@ impl<'a> Page for About<'a> {
             })
             .collect();
 
-        let links_line = Line::from(line_items);
+        let links_line = line_from_spans(line_items);
 
         let paragraph = Paragraph::new(vec![
             line_1,
