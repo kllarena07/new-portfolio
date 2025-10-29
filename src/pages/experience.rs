@@ -1,10 +1,10 @@
 use crossterm::event::KeyCode;
 use ratatui::{
+    layout::Constraint,
     prelude::Stylize,
     style::{Color, Style},
     text::{Line, Span},
     widgets::{Block, Cell, Padding, Paragraph, Row, Table, Wrap},
-    layout::Constraint,
 };
 
 pub struct ExperienceItem {
@@ -26,6 +26,44 @@ pub struct Experience {
 
 impl Experience {
     pub fn new(experiences: Vec<ExperienceItem>) -> Self {
+        let _experience_items = vec![
+            ExperienceItem {
+                role: String::from("swe intern"),
+                affiliation: String::from("capital one"),
+                time: String::from("(jun 2026-aug 2026)"),
+            },
+            ExperienceItem {
+                role: String::from("ceo / cto"),
+                affiliation: String::from("ootd"),
+                time: String::from("(mar 2025-oct 2025)"),
+            },
+            ExperienceItem {
+                role: String::from("swe intern"),
+                affiliation: String::from("capital one"),
+                time: String::from("(jun 2025-aug 2025)"),
+            },
+            ExperienceItem {
+                role: String::from("mobile app dev"),
+                affiliation: String::from("swe, um-dearborn"),
+                time: String::from("(feb 2025-mar 2025)"),
+            },
+            ExperienceItem {
+                role: String::from("frontend dev"),
+                affiliation: String::from("gdsc, um-dearborn"),
+                time: String::from("(nov 2023-dec 2023)"),
+            },
+            ExperienceItem {
+                role: String::from("fullstack dev"),
+                affiliation: String::from("adhd magazine"),
+                time: String::from("(may 2023-aug 2023)"),
+            },
+            ExperienceItem {
+                role: String::from("incubatee"),
+                affiliation: String::from("ai camp"),
+                time: String::from("(sep 2022-nov 2022)"),
+            },
+        ];
+
         Self {
             state: 0,
             experiences,

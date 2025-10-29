@@ -1,34 +1,34 @@
+use crate::pages::page::Page;
 use crossterm::event::KeyCode;
 use ratatui::{
+    Frame,
+    layout::Rect,
     prelude::Stylize,
     style::{Color, Style},
     text::{Line, Span},
+    widgets::canvas::{Canvas, Points},
     widgets::{Block, Padding, Paragraph, Wrap},
 };
 
 #[derive(Clone)]
-pub struct ContactLink {
-    pub display_text: String,
-    pub link: String,
+pub struct ContactLink<'a> {
+    pub display_text: &'a str,
+    pub link: &'a str,
 }
 
-pub struct About {
-    pub state: usize,
-    pub current_link: String,
-    pub links: Vec<ContactLink>,
+pub struct About<'a> {
+    pub name: String,
+    state: usize,
+    current_link: String,
+    links: Vec<ContactLink<'a>>,
 }
 
-impl About {
-    pub fn new(links: Vec<ContactLink>) -> Self {
-        let current_link = links[0].link.clone();
-        Self {
-            state: 0,
-            current_link,
-            links,
-        }
+impl<'a> Page for About<'a> {
+    fn title(&self) -> &str {
+        &self.name
     }
 
-    pub fn build(&self) -> Paragraph<'_> {
+    fn render(&self, frame: &mut Frame, area: Rect) {
         let line_1 = Line::from(vec![
             Span::styled(
                 "hey! my name is ",
@@ -129,7 +129,7 @@ impl About {
 
         let links_line = Line::from(line_items);
 
-        Paragraph::new(vec![
+        let paragraph = Paragraph::new(vec![
             line_1,
             Line::from(""),
             line_2,
@@ -150,41 +150,101 @@ impl About {
             top: 0,
             bottom: 0,
         }))
-        .wrap(Wrap { trim: true })
+        .wrap(Wrap { trim: true });
+
+        frame.render_widget(paragraph, area);
     }
 
-    pub fn keyboard_event_handler(&mut self, key_code: KeyCode) -> Option<String> {
+    fn render_additional(&self, frame: &mut Frame, area: Rect) {
+        let canvas_width = area.width as f64;
+        let canvas_height = (area.height * 2) as f64; // HalfBlock doubles vertical resolution
+
+        Canvas::default()
+            .marker(ratatui::symbols::Marker::HalfBlock)
+            .x_bounds([0.0, canvas_width])
+            .y_bounds([0.0, canvas_height])
+            .paint(|ctx| {
+                // Stretch the 112x112 frame to fill the entire canvas area
+                let frame_width = 112.0;
+                let frame_height = 112.0;
+                // Draw pixels from the current frame, mapping each pixel to fill the canvas
+                for (y, row) in current_frame.iter().enumerate() {
+                    for (x, pixel) in row.iter().enumerate() {
+                        // Map frame coordinates directly to canvas coordinates
+                        let canvas_x = (x as f64 / frame_width) * canvas_width;
+                        let canvas_y = canvas_height - ((y as f64 / frame_height) * canvas_height);
+                        ctx.draw(&Points {
+                            coords: &[(canvas_x, canvas_y)],
+                            color: ratatui::style::Color::Rgb(pixel[0], pixel[1], pixel[2]),
+                        });
+                    }
+                }
+            });
+    }
+
+    fn keyboard_event_handler(&mut self, key_code: KeyCode) -> bool {
         match key_code {
             KeyCode::Left => {
                 self.previous_link();
-                None
+                true
             }
             KeyCode::Right => {
                 self.next_link();
-                None
+                true
             }
             KeyCode::Enter => {
-                if !self.current_link.is_empty() {
-                    Some(self.current_link.clone())
-                } else {
-                    None
-                }
+                let _ = open::that(&self.current_link);
+                true
             }
-            _ => None,
+            _ => false,
+        }
+    }
+}
+
+impl<'a> About<'a> {
+    pub fn new() -> Self {
+        let links: Vec<ContactLink> = vec![
+            ContactLink {
+                display_text: "twitter",
+                link: "https://x.com/krayondev",
+            },
+            ContactLink {
+                display_text: "linkedin",
+                link: "https://www.linkedin.com/in/kllarena07/",
+            },
+            ContactLink {
+                display_text: "github",
+                link: "https://github.com/kllarena07",
+            },
+            ContactLink {
+                display_text: "email",
+                link: "mailto:kieran.llarena@gmail.com",
+            },
+        ];
+
+        Self {
+            name: String::from("about"),
+            state: 0,
+            current_link: String::from(links[0].link),
+            links,
         }
     }
 
     fn previous_link(&mut self) {
         if self.state > 0 {
             self.state -= 1;
-            self.current_link = self.links[self.state].link.to_owned();
+            self.change_current_link();
         }
     }
 
     fn next_link(&mut self) {
-        if self.state < self.links.len() - 1 {
+        if self.state + 1 < self.links.len() {
             self.state += 1;
-            self.current_link = self.links[self.state].link.to_owned();
+            self.change_current_link();
         }
+    }
+
+    fn change_current_link(&mut self) {
+        self.current_link = String::from(self.links[self.state].link);
     }
 }

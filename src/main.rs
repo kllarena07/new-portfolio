@@ -6,21 +6,13 @@ use ratatui::{
     style::{Color, Style, Stylize},
     symbols,
     text::Span,
-    widgets::{
-        Block, Borders, List, ListItem, Padding,
-        canvas::{Canvas, Points},
-    },
+    widgets::{Block, Borders, List, ListItem, Padding},
 };
 use std::fs;
 use std::{io, sync::mpsc, thread, time::Duration};
 
 mod pages;
-use pages::{
-    about::{About, ContactLink},
-    experience::{Experience as ExperiencePage, ExperienceItem},
-    projects::Projects,
-    leadership::Leadership,
-};
+use pages::{about::About, page::Page};
 
 fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
     const LIMIT_TO_10_FRAMES: bool = true; // Set to true to only load first 10 frames
@@ -108,76 +100,16 @@ fn main() -> io::Result<()> {
         all_frames[0][0].len(),
         all_frames[0].len()
     );
-    let pages = vec!["about", "experience", "projects", "leadership"];
 
-    let links: Vec<ContactLink> = vec![
-        ContactLink {
-            display_text: String::from("twitter"),
-            link: String::from("https://x.com/krayondev"),
-        },
-        ContactLink {
-            display_text: String::from("linkedin"),
-            link: String::from("https://www.linkedin.com/in/kllarena07/"),
-        },
-        ContactLink {
-            display_text: String::from("github"),
-            link: String::from("https://github.com/kllarena07"),
-        },
-        ContactLink {
-            display_text: String::from("email"),
-            link: String::from("mailto:kieran.llarena@gmail.com"),
-        },
-    ];
-
-    let experience_items = vec![
-        ExperienceItem {
-            role: String::from("swe intern"),
-            affiliation: String::from("capital one"),
-            time: String::from("(jun 2026-aug 2026)"),
-        },
-        ExperienceItem {
-            role: String::from("ceo / cto"),
-            affiliation: String::from("ootd"),
-            time: String::from("(mar 2025-oct 2025)"),
-        },
-        ExperienceItem {
-            role: String::from("swe intern"),
-            affiliation: String::from("capital one"),
-            time: String::from("(jun 2025-aug 2025)"),
-        },
-        ExperienceItem {
-            role: String::from("mobile app dev"),
-            affiliation: String::from("swe, um-dearborn"),
-            time: String::from("(feb 2025-mar 2025)"),
-        },
-        ExperienceItem {
-            role: String::from("frontend dev"),
-            affiliation: String::from("gdsc, um-dearborn"),
-            time: String::from("(nov 2023-dec 2023)"),
-        },
-        ExperienceItem {
-            role: String::from("fullstack dev"),
-            affiliation: String::from("adhd magazine"),
-            time: String::from("(may 2023-aug 2023)"),
-        },
-        ExperienceItem {
-            role: String::from("incubatee"),
-            affiliation: String::from("ai camp"),
-            time: String::from("(sep 2022-nov 2022)"),
-        },
-    ];
+    let pages: Vec<Box<dyn Page>> = vec![Box::new(About::new())];
 
     let mut app = App {
         running: true,
         selected_page: 0,
-        count: 0,
+        frame_number: 0,
         pages,
         all_frames,
         max_frames,
-        about_page: About::new(links),
-        experience_page: ExperiencePage::new(experience_items),
-        projects_page: Projects::new(),
-        leadership_page: Leadership::new(),
     };
 
     let mut terminal = ratatui::init();
@@ -227,26 +159,21 @@ fn run_background_thread(tx: mpsc::Sender<Event>, max_frames: usize) {
     }
 }
 
-
-struct App<'a> {
+struct App {
     running: bool,
     selected_page: usize,
-    count: usize,
+    frame_number: usize,
     max_frames: usize,
-    pages: Vec<&'a str>,
+    pages: Vec<Box<dyn Page>>,
     all_frames: Vec<Vec<Vec<[u8; 3]>>>,
-    about_page: About,
-    experience_page: ExperiencePage,
-    projects_page: Projects,
-    leadership_page: Leadership,
 }
 
-impl<'a> App<'a> {
+impl App {
     fn run(&mut self, terminal: &mut DefaultTerminal, rx: mpsc::Receiver<Event>) -> io::Result<()> {
         while self.running {
             match rx.recv().unwrap() {
                 Event::Input(key_event) => self.handle_key_event(key_event)?,
-                Event::Counter(count) => self.count = count,
+                Event::Counter(count) => self.frame_number = count,
             }
 
             terminal.draw(|frame| self.draw(frame))?;
@@ -261,7 +188,7 @@ impl<'a> App<'a> {
         }
 
         // Get the current frame based on the counter
-        let current_frame_index = self.count % self.max_frames;
+        let current_frame_index = self.frame_number % self.max_frames;
         let current_frame = &self.all_frames[current_frame_index];
 
         let [vertical_area] = Layout::vertical([Constraint::Percentage(35)])
@@ -302,65 +229,21 @@ impl<'a> App<'a> {
         // );
 
         let menu_widget = self.build_menu_widget();
-        match self.selected_page {
-            0 => {
-                let about_widget = self.about_page.build();
-                frame.render_widget(about_widget, center_area);
-            }
-            1 => {
-                let experience_widget = self.experience_page.build();
-                frame.render_widget(experience_widget, center_area);
-            }
-            2 => {
-                let projects_widget = self.projects_page.build();
-                frame.render_widget(projects_widget, center_area);
-            }
-            3 => {
-                let leadership_widget = self.leadership_page.build();
-                frame.render_widget(leadership_widget, center_area);
-            }
-            _ => {}
-        }
-
-        // Canvas bounds should match terminal character dimensions
-        // For HalfBlock marker, each terminal cell is 1 wide and 2 tall in canvas coordinates
-        let canvas_width = canvas_area.width as f64;
-        let canvas_height = (canvas_area.height * 2) as f64; // HalfBlock doubles vertical resolution
-
-        let canvas = Canvas::default()
-            .marker(ratatui::symbols::Marker::HalfBlock)
-            .x_bounds([0.0, canvas_width])
-            .y_bounds([0.0, canvas_height])
-            .paint(|ctx| {
-                // Stretch the 112x112 frame to fill the entire canvas area
-                let frame_width = 112.0;
-                let frame_height = 112.0;
-
-                // Draw pixels from the current frame, mapping each pixel to fill the canvas
-                for (y, row) in current_frame.iter().enumerate() {
-                    for (x, pixel) in row.iter().enumerate() {
-                        // Map frame coordinates directly to canvas coordinates
-                        let canvas_x = (x as f64 / frame_width) * canvas_width;
-                        let canvas_y = canvas_height - ((y as f64 / frame_height) * canvas_height);
-
-                        ctx.draw(&Points {
-                            coords: &[(canvas_x, canvas_y)],
-                            color: ratatui::style::Color::Rgb(pixel[0], pixel[1], pixel[2]),
-                        });
-                    }
-                }
-            });
-
         frame.render_widget(menu_widget, menu_area);
 
-        match self.selected_page {
-            0 => frame.render_widget(canvas, canvas_area),
-            1 => {
-                let description = self.experience_page.build_description();
-                frame.render_widget(description, canvas_area)
-            }
-            _ => {},
-        };
+        if let Some(current_page) = self.pages.get(self.selected_page) {
+            current_page.render(frame, center_area);
+            current_page.render_additional(frame, canvas_area);
+        }
+
+        // match self.selected_page {
+        //     0 => frame.render_widget(canvas, canvas_area),
+        //     1 => {
+        //         let description = self.experience_page.build_description();
+        //         frame.render_widget(description, canvas_area)
+        //     }
+        //     _ => {}
+        // };
     }
 
     fn previous_page(&mut self) {
@@ -375,7 +258,6 @@ impl<'a> App<'a> {
         }
     }
 
-
     fn handle_key_event(&mut self, key_event: crossterm::event::KeyEvent) -> io::Result<()> {
         match key_event.code {
             KeyCode::Char('q') => {
@@ -384,43 +266,29 @@ impl<'a> App<'a> {
             KeyCode::Up => self.previous_page(),
             KeyCode::Down => self.next_page(),
             _ => {
-                // Delegate to current page's keyboard handler
-                let handled = match self.selected_page {
-                    0 => {
-                        if let Some(link) = self.about_page.keyboard_event_handler(key_event.code) {
-                            open::that(&link).unwrap();
-                        }
-                        true
-                    }
-                    1 => self.experience_page.keyboard_event_handler(key_event.code),
-                    2 => self.projects_page.keyboard_event_handler(key_event.code),
-                    3 => self.leadership_page.keyboard_event_handler(key_event.code),
-                    _ => false,
-                };
-                // handled variable is available for future use if needed
-                let _ = handled;
+                if let Some(current_page) = self.pages.get_mut(self.selected_page) {
+                    let _ = current_page.keyboard_event_handler(key_event.code);
+                }
             }
         }
 
         Ok(())
     }
 
-
     fn build_menu_widget(&self) -> List<'_> {
         let menu_items: Vec<ListItem> = (0..self.pages.len())
             .map(move |index| {
-                let item_content = match index == self.selected_page {
-                    true => format!("[ {} ]", self.pages[index]),
-                    false => self.pages[index].to_owned(),
+                let title = self.pages[index].title();
+                let item_content = if index == self.selected_page {
+                    format!("[ {} ]", title)
+                } else {
+                    title.to_string()
                 };
 
-                let span = match index == self.selected_page {
-                    true => {
-                        Span::styled(item_content, Style::default().fg(Color::Rgb(255, 255, 255)))
-                    }
-                    false => {
-                        Span::styled(item_content, Style::default().fg(Color::Rgb(147, 147, 147)))
-                    }
+                let span = if index == self.selected_page {
+                    Span::styled(item_content, Style::default().fg(Color::Rgb(255, 255, 255)))
+                } else {
+                    Span::styled(item_content, Style::default().fg(Color::Rgb(147, 147, 147)))
                 };
 
                 ListItem::new(span.bold().into_right_aligned_line())
