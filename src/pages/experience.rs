@@ -1,16 +1,20 @@
 use crossterm::event::KeyCode;
 use ratatui::{
+    Frame,
     layout::Constraint,
+    layout::Rect,
     prelude::Stylize,
     style::{Color, Style},
     text::{Line, Span},
     widgets::{Block, Cell, Padding, Paragraph, Row, Table, Wrap},
 };
 
-pub struct ExperienceItem {
-    pub role: String,
-    pub affiliation: String,
-    pub time: String,
+use crate::pages::page::Page;
+
+struct ExperienceItem {
+    role: String,
+    affiliation: String,
+    time: String,
 }
 
 impl ExperienceItem {
@@ -20,13 +24,13 @@ impl ExperienceItem {
 }
 
 pub struct Experience {
-    pub state: usize,
-    pub experiences: Vec<ExperienceItem>,
+    state: usize,
+    experiences: Vec<ExperienceItem>,
 }
 
 impl Experience {
-    pub fn new(experiences: Vec<ExperienceItem>) -> Self {
-        let _experience_items = vec![
+    pub fn new() -> Self {
+        let experiences = vec![
             ExperienceItem {
                 role: String::from("swe intern"),
                 affiliation: String::from("capital one"),
@@ -70,47 +74,20 @@ impl Experience {
         }
     }
 
-    pub fn build(&self) -> Table<'_> {
-        let header = ["role", "affiliation", "time"]
-            .into_iter()
-            .map(Cell::from)
-            .collect::<Row>()
-            .height(1);
-
-        let rows = self.experiences.iter().enumerate().map(|(i, data)| {
-            let item = data.ref_array();
-
-            let style_config = match i == self.state {
-                true => Style::new().fg(Color::Rgb(0, 0, 0)).bg(Color::White),
-                false => Style::new().fg(Color::Rgb(147, 147, 147)),
-            };
-
-            item.into_iter()
-                .map(|content| Cell::from(content.as_str()))
-                .collect::<Row>()
-                .style(style_config)
-                .height(1)
-        });
-
-        Table::new(
-            rows,
-            [
-                Constraint::Fill(1),
-                Constraint::Fill(1),
-                Constraint::Fill(1),
-            ],
-        )
-        .header(header)
-        .block(Block::new().padding(Padding {
-            left: 1,
-            right: 2,
-            top: 0,
-            bottom: 0,
-        }))
+    fn previous_experience(&mut self) {
+        if self.state > 0 {
+            self.state -= 1;
+        }
     }
 
-    pub fn build_description(&self) -> Paragraph<'_> {
-        let mut description: Vec<Line<'_>> = match self.state {
+    fn next_experience(&mut self) {
+        if self.state < self.experiences.len() - 1 {
+            self.state += 1;
+        }
+    }
+
+    fn get_description(&self) -> Vec<Line<'_>> {
+        match self.state {
             0 => {
                 vec![Line::from(vec![
                     Span::from("incoming summer 2026 under the tip program")
@@ -228,39 +205,74 @@ impl Experience {
                         .fg(Color::Rgb(147, 147, 147)),
                 ]),]
             }
-            _ => {
-                vec![]
-            }
-        };
+            _ => vec![],
+        }
+    }
+}
 
-        description.insert(0, Line::from(vec![Span::from("desc").fg(Color::White)]));
-
-        Paragraph::new(description).wrap(Wrap { trim: true })
+impl Page for Experience {
+    fn title(&self) -> &str {
+        "experience"
     }
 
-    pub fn keyboard_event_handler(&mut self, key_code: KeyCode) -> bool {
+    fn render(&self, frame: &mut Frame, area: Rect) {
+        let header = ["role", "affiliation", "time"]
+            .into_iter()
+            .map(Cell::from)
+            .collect::<Row>()
+            .height(1);
+
+        let rows = self.experiences.iter().enumerate().map(|(i, data)| {
+            let item = data.ref_array();
+
+            let style_config = match i == self.state {
+                true => Style::new().fg(Color::Rgb(0, 0, 0)).bg(Color::White),
+                false => Style::new().fg(Color::Rgb(147, 147, 147)),
+            };
+
+            item.into_iter()
+                .map(|content| Cell::from(content.as_str()))
+                .collect::<Row>()
+                .style(style_config)
+                .height(1)
+        });
+
+        let table = Table::new(
+            rows,
+            [
+                Constraint::Fill(1),
+                Constraint::Fill(1),
+                Constraint::Fill(1),
+            ],
+        )
+        .header(header)
+        .block(Block::new().padding(Padding {
+            left: 1,
+            right: 2,
+            top: 0,
+            bottom: 0,
+        }));
+
+        frame.render_widget(table, area);
+    }
+
+    fn render_additional(&self, frame: &mut Frame, area: Rect) {
+        let mut description = self.get_description();
+        description.insert(0, Line::from(vec![Span::from("desc").fg(Color::White)]));
+
+        let paragraph = Paragraph::new(description).wrap(Wrap { trim: true });
+        frame.render_widget(paragraph, area);
+    }
+
+    fn keyboard_event_handler(&mut self, key_code: KeyCode) {
         match key_code {
             KeyCode::Char('k') => {
                 self.previous_experience();
-                true
             }
             KeyCode::Char('j') => {
                 self.next_experience();
-                true
             }
-            _ => false,
-        }
-    }
-
-    fn previous_experience(&mut self) {
-        if self.state > 0 {
-            self.state -= 1;
-        }
-    }
-
-    fn next_experience(&mut self) {
-        if self.state < self.experiences.len() - 1 {
-            self.state += 1;
+            _ => {}
         }
     }
 }

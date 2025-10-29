@@ -19,7 +19,6 @@ pub struct ContactLink<'a> {
 }
 
 pub struct About<'a> {
-    pub name: String,
     state: usize,
     current_link: String,
     links: Vec<ContactLink<'a>>,
@@ -30,7 +29,7 @@ pub struct About<'a> {
 
 impl<'a> Page for About<'a> {
     fn title(&self) -> &str {
-        &self.name
+        "about"
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) {
@@ -194,21 +193,18 @@ impl<'a> Page for About<'a> {
         frame.render_widget(canvas, area);
     }
 
-    fn keyboard_event_handler(&mut self, key_code: KeyCode) -> bool {
+    fn keyboard_event_handler(&mut self, key_code: KeyCode) {
         match key_code {
             KeyCode::Left => {
                 self.previous_link();
-                true
             }
             KeyCode::Right => {
                 self.next_link();
-                true
             }
             KeyCode::Enter => {
-                let _ = open::that(&self.current_link);
-                true
+                open::that(&self.current_link).unwrap();
             }
-            _ => false,
+            _ => {}
         }
     }
 
@@ -243,7 +239,6 @@ impl<'a> About<'a> {
         let max_frames = all_frames.len();
 
         Self {
-            name: String::from("about"),
             state: 0,
             current_link: String::from(links[0].link),
             links,

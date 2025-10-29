@@ -10,10 +10,10 @@ use ratatui::{
 use std::{io, sync::mpsc, thread, time::Duration};
 
 mod pages;
-use pages::{about::About, page::Page};
+use pages::{about::About, experience::Experience, page::Page};
 
 fn main() -> io::Result<()> {
-    let pages: Vec<Box<dyn Page>> = vec![Box::new(About::new())];
+    let pages: Vec<Box<dyn Page>> = vec![Box::new(About::new()), Box::new(Experience::new())];
 
     let mut app = App {
         running: true,
@@ -134,15 +134,6 @@ impl App {
             current_page.render(frame, center_area);
             current_page.render_additional(frame, canvas_area);
         }
-
-        // match self.selected_page {
-        //     0 => frame.render_widget(canvas, canvas_area),
-        //     1 => {
-        //         let description = self.experience_page.build_description();
-        //         frame.render_widget(description, canvas_area)
-        //     }
-        //     _ => {}
-        // };
     }
 
     fn previous_page(&mut self) {
@@ -166,7 +157,7 @@ impl App {
             KeyCode::Down => self.next_page(),
             _ => {
                 if let Some(current_page) = self.pages.get_mut(self.selected_page) {
-                    let _ = current_page.keyboard_event_handler(key_event.code);
+                    current_page.keyboard_event_handler(key_event.code);
                 }
             }
         }
