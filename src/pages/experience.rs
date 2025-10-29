@@ -10,6 +10,7 @@ use ratatui::{
 };
 
 use crate::pages::page::Page;
+use crate::pages::style::{gray_span, selected_style, white_span};
 
 struct ExperienceItem {
     role: String,
@@ -90,24 +91,22 @@ impl Experience {
         match self.state {
             0 => {
                 vec![Line::from(vec![
-                    Span::from("incoming summer 2026 under the tip program")
-                        .fg(Color::Rgb(147, 147, 147)),
+                    gray_span("incoming summer 2026 under the tip program"),
                 ])]
             }
             1 => {
                 vec![
                     Line::from(
                         vec![
-                            Span::from("led a team of 4 to ship an irl dress to impress mobile app with 260+ users")
-                        .fg(Color::Rgb(147, 147, 147))]
+                            gray_span("led a team of 4 to ship an irl dress to impress mobile app with 260+ users"),
+                        ]
                         ),
                     Line::from(""),
                     Line::from(vec![
-                        Span::from("notable highlights:")
-                        .fg(Color::Rgb(147, 147, 147))
+                        gray_span("notable highlights:"),
                     ]),
                     Line::from(vec![
-                        Span::from("- achieved a 3x boost in dau retention by analyzing user behavior patterns and implementing targeted push notifications").fg(Color::Rgb(147, 147, 147))
+                        gray_span("- achieved a 3x boost in dau retention by analyzing user behavior patterns and implementing targeted push notifications"),
                     ])
                 ]
             }
@@ -115,19 +114,16 @@ impl Experience {
                 vec![
                     Line::from(
                         vec![
-                            Span::from("worked on the capital one empath dashboard on a team of 5")
-                        .fg(Color::Rgb(147, 147, 147))
+                            gray_span("worked on the capital one empath dashboard on a team of 5"),
                         ]
                         ),
                     Line::from(""),
                     Line::from(vec![
-                        Span::from("notable highlights:")
-                        .fg(Color::Rgb(147, 147, 147))
+                        gray_span("notable highlights:"),
                     ]),
                     Line::from(
                         vec![
-                            Span::from("- created a digital enrollment status badge to help reduce Capital One agent call times by 12%")
-                        .fg(Color::Rgb(147, 147, 147))
+                            gray_span("- created a digital enrollment status badge to help reduce Capital One agent call times by 12%"),
                         ]
                         )
                 ]
@@ -136,73 +132,65 @@ impl Experience {
                 vec![
                     Line::from(
                         vec![
-                            Span::from("solo developed an event management mobile app for the society of women engineers at the university of michigan-dearborn's power conference")
-                        .fg(Color::Rgb(147, 147, 147))]
+                            gray_span("solo developed an event management mobile app for the society of women engineers at the university of michigan-dearborn's power conference"),
+                        ]
                         ),
                     Line::from(""),
                     Line::from(
                         vec![
-                            Span::from("features include qr code check-ins and a live agenda, message feed, and push notifications to keep attendees updated")
-                        .fg(Color::Rgb(147, 147, 147))]
+                            gray_span("features include qr code check-ins and a live agenda, message feed, and push notifications to keep attendees updated"),
+                        ]
                         ),
                     Line::from(""),
                     Line::from(vec![
-                        Span::from("notable highlights:")
-                            .fg(Color::Rgb(147, 147, 147))
+                        gray_span("notable highlights:"),
                     ]),
                     Line::from(vec![
-                        Span::from("- deployed to the ios app store as 'power um-d'").fg(Color::Rgb(147, 147, 147))
+                        gray_span("- deployed to the ios app store as 'power um-d'"),
                     ]),
                     Line::from(vec![
-                        Span::from("- supported 80+ attendees").fg(Color::Rgb(147, 147, 147))
+                        gray_span("- supported 80+ attendees"),
                     ])
                 ]
             }
             4 => {
                 vec![
                     Line::from(vec![
-                        Span::from("built the michigan devfest 2023 website on a team of 8")
-                            .fg(Color::Rgb(147, 147, 147)),
+                        gray_span("built the michigan devfest 2023 website on a team of 8"),
                     ]),
                     Line::from(""),
                     Line::from(vec![
-                        Span::from("notable highlights:").fg(Color::Rgb(147, 147, 147)),
+                        gray_span("notable highlights:"),
                     ]),
                     Line::from(vec![
-                        Span::from("- website drove 300+ event attendees")
-                            .fg(Color::Rgb(147, 147, 147)),
+                        gray_span("- website drove 300+ event attendees"),
                     ]),
                 ]
             }
             5 => {
                 vec![
                     Line::from(vec![
-                        Span::from(
-                            "designed a blog platform to showcase detroit's underground culture",
-                        )
-                        .fg(Color::Rgb(147, 147, 147)),
+                        gray_span("designed a blog platform to showcase detroit's underground culture"),
                     ]),
                     Line::from(""),
                     Line::from(vec![
-                        Span::from("notable highlights:").fg(Color::Rgb(147, 147, 147)),
+                        gray_span("notable highlights:"),
                     ]),
                     Line::from(vec![
-                        Span::from("- engaged an audience of 2500+ followers")
-                            .fg(Color::Rgb(147, 147, 147)),
+                        gray_span("- engaged an audience of 2500+ followers"),
                     ]),
                 ]
             }
             6 => {
                 vec![Line::from(vec![
-                    Span::from("created gpt-3 wrapper that summarized videos, audio, and text as part of the 2023 ai camp incubator program").fg(Color::Rgb(147, 147, 147)),
+                    gray_span("created gpt-3 wrapper that summarized videos, audio, and text as part of the 2023 ai camp incubator program"),
                 ]),
                 Line::from(""),
                 Line::from(vec![
-                    Span::from("notable highlights:").fg(Color::Rgb(147, 147, 147)),
+                    gray_span("notable highlights:"),
                 ]),
                 Line::from(vec![
-                    Span::from("- won $500 by placing 2nd place out of 21 other teams")
-                        .fg(Color::Rgb(147, 147, 147)),
+                    gray_span("- won $500 by placing 2nd place out of 21 other teams"),
                 ]),]
             }
             _ => vec![],
@@ -226,7 +214,7 @@ impl Page for Experience {
             let item = data.ref_array();
 
             let style_config = match i == self.state {
-                true => Style::new().fg(Color::Rgb(0, 0, 0)).bg(Color::White),
+                true => selected_style(),
                 false => Style::new().fg(Color::Rgb(147, 147, 147)),
             };
 
@@ -258,7 +246,7 @@ impl Page for Experience {
 
     fn render_additional(&self, frame: &mut Frame, area: Rect) {
         let mut description = self.get_description();
-        description.insert(0, Line::from(vec![Span::from("desc").fg(Color::White)]));
+        description.insert(0, Line::from(vec![white_span("desc")]));
 
         let paragraph = Paragraph::new(description).wrap(Wrap { trim: true });
         frame.render_widget(paragraph, area);

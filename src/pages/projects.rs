@@ -8,6 +8,7 @@ use ratatui::{
 };
 
 use crate::pages::page::Page;
+use crate::pages::style::{gray_span, selected_style, white_span};
 
 struct ProjectItem {
     name: String,
@@ -44,7 +45,7 @@ impl Page for Projects {
             let item = data.ref_name();
 
             let style_config = match i == self.state {
-                true => Style::new().fg(Color::Rgb(0, 0, 0)).bg(Color::White),
+                true => selected_style(),
                 false => Style::new().fg(Color::Rgb(147, 147, 147)),
             };
 
@@ -69,7 +70,7 @@ impl Page for Projects {
 
     fn render_additional(&self, frame: &mut Frame, area: Rect) {
         let mut description = self.get_description();
-        description.insert(0, Line::from(vec![Span::from("desc").fg(Color::White)]));
+        description.insert(0, Line::from(vec![white_span("desc")]));
 
         let paragraph = Paragraph::new(description).wrap(Wrap { trim: true });
         frame.render_widget(paragraph, area);
@@ -264,7 +265,7 @@ impl Projects {
         let project_item = &self.projects[project_index];
 
         for prize in &project_item.prizes {
-            final_vec.push(Line::from(prize.to_string()).fg(Color::Rgb(147, 147, 147)));
+            final_vec.push(Line::from(vec![gray_span(&prize)]));
         }
 
         if project_item.prizes.len() > 0 {
@@ -272,7 +273,7 @@ impl Projects {
         }
 
         for desc_part in &project_item.description {
-            final_vec.push(Line::from(desc_part.to_string()).fg(Color::Rgb(147, 147, 147)));
+            final_vec.push(Line::from(vec![gray_span(&desc_part)]));
         }
 
         final_vec

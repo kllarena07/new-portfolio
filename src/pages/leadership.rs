@@ -3,13 +3,13 @@ use ratatui::{
     Frame,
     layout::Constraint,
     layout::Rect,
-    prelude::Stylize,
     style::{Color, Style},
-    text::{Line, Span},
+    text::Line,
     widgets::{Block, Cell, Padding, Paragraph, Row, Table, Wrap},
 };
 
 use crate::pages::page::Page;
+use crate::pages::style::{gray_span, selected_style, white_span};
 
 struct ExperienceItem {
     role: String,
@@ -65,37 +65,27 @@ impl Leadership {
         match self.state {
             0 => {
                 vec![
-                    Line::from(
-                        Span::from("building the largest network of filipino tech professionals to help make tech more accessible for filipinos. currently at 263 members").fg(Color::Rgb(147, 147, 147)),
-                    ),
+                    Line::from(gray_span(
+                        "building the largest network of filipino tech professionals to help make tech more accessible for filipinos. currently at 263 members",
+                    )),
                     Line::from(""),
-                    Line::from(
-                        Span::from("notable highlights:").fg(Color::Rgb(147, 147, 147)),
-                    ),
-                    Line::from(
-                        Span::from("- collaborated amazon, dreamhaven, and aapi in gaming").fg(Color::Rgb(147, 147, 147)),
-                    ),
-                    Line::from(
-                        Span::from("- organized a hackathon to help filipino businesses that was sponsored by vercel, warp, and sorce (yc f25)").fg(Color::Rgb(147, 147, 147)),
-                    ),
+                    Line::from(gray_span("notable highlights:")),
+                    Line::from(gray_span(
+                        "- collaborated amazon, dreamhaven, and aapi in gaming",
+                    )),
+                    Line::from(gray_span(
+                        "- organized a hackathon to help filipino businesses that was sponsored by vercel, warp, and sorce (yc f25)",
+                    )),
                 ]
             }
             1 => {
                 vec![
-                    Line::from(
-                        Span::from(
-                            "built a 6,000+ member hackathon community",
-                        ).fg(Color::Rgb(147, 147, 147))
-                    ),
+                    Line::from(gray_span("built a 6,000+ member hackathon community")),
                     Line::from(""),
-                    Line::from(
-                        Span::from("notable highlights:").fg(Color::Rgb(147, 147, 147)),
-                    ),
-                    Line::from(
-                        Span::from(
-                            "- secured $2k in sponsorship backing from companies like koyeb and tensordock",
-                        ).fg(Color::Rgb(147, 147, 147))
-                    )
+                    Line::from(gray_span("notable highlights:")),
+                    Line::from(gray_span(
+                        "- secured $2k in sponsorship backing from companies like koyeb and tensordock",
+                    )),
                 ]
             }
             _ => vec![],
@@ -119,7 +109,7 @@ impl Page for Leadership {
             let item = data.ref_array();
 
             let style_config = match i == self.state {
-                true => Style::new().fg(Color::Rgb(0, 0, 0)).bg(Color::White),
+                true => selected_style(),
                 false => Style::new().fg(Color::Rgb(147, 147, 147)),
             };
 
@@ -135,7 +125,7 @@ impl Page for Leadership {
             [
                 Constraint::Fill(1),
                 Constraint::Fill(2),
-                Constraint::Fill(1),
+                Constraint::Fill(2),
             ],
         )
         .header(header)
@@ -151,7 +141,7 @@ impl Page for Leadership {
 
     fn render_additional(&self, frame: &mut Frame, area: Rect) {
         let mut description = self.get_description();
-        description.insert(0, Line::from(vec![Span::from("desc").fg(Color::White)]));
+        description.insert(0, Line::from(vec![white_span("desc")]));
 
         let paragraph = Paragraph::new(description).wrap(Wrap { trim: true });
         frame.render_widget(paragraph, area);

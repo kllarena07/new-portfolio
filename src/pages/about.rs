@@ -1,4 +1,5 @@
 use crate::pages::page::Page;
+use crate::pages::style::{gray_span, white_span, accent_underlined_style, gray_style, selected_style};
 use crossterm::event::KeyCode;
 use image::ImageReader;
 use ratatui::{
@@ -34,95 +35,50 @@ impl<'a> Page for About<'a> {
 
     fn render(&self, frame: &mut Frame, area: Rect) {
         let line_1 = Line::from(vec![
-            Span::styled(
-                "hey! my name is ",
-                Style::default().fg(Color::Rgb(147, 147, 147)),
-            ),
-            Span::styled(
-                "kieran llarena",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
+            gray_span("hey! my name is "),
+            white_span("kieran llarena"),
         ]);
 
         let line_2 = Line::from(vec![
-            Span::styled(
-                "im currently studying ",
-                Style::default().fg(Color::Rgb(147, 147, 147)),
-            ),
-            Span::styled(
-                "computer science ",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
-            Span::styled("at the ", Style::default().fg(Color::Rgb(147, 147, 147))),
-            Span::styled(
-                "university of michigan-dearborn",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
+            gray_span("im currently studying "),
+            white_span("computer science "),
+            gray_span("at the "),
+            white_span("university of michigan-dearborn"),
         ]);
 
         let line_3 = Line::from(vec![
-            Span::styled(
-                "my expected graduation date is ",
-                Style::default().fg(Color::Rgb(147, 147, 147)),
-            ),
-            Span::styled("may 2027", Style::default().fg(Color::Rgb(255, 255, 255))),
+            gray_span("my expected graduation date is "),
+            white_span("may 2027"),
         ]);
 
         let line_4 = Line::from(vec![
-            Span::styled(
-                "i thrive best in environments that value ",
-                Style::default().fg(Color::Rgb(147, 147, 147)),
-            ),
-            Span::styled(
-                "high velocity ",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
-            Span::styled("and ", Style::default().fg(Color::Rgb(147, 147, 147))),
-            Span::styled(
-                "strong ownership",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
+            gray_span("i thrive best in environments that value "),
+            white_span("high velocity "),
+            gray_span("and "),
+            white_span("strong ownership"),
         ]);
 
         let line_5 = Line::from(vec![
-            Span::styled(
-                "my background is rooted in ",
-                Style::default().fg(Color::Rgb(147, 147, 147)),
-            ),
-            Span::styled(
-                "web and mobile fullstack development",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
+            gray_span("my background is rooted in "),
+            white_span("web and mobile fullstack development"),
         ]);
 
         let line_6 = Line::from(vec![
-            Span::styled(
-                "im currently exploring ",
-                Style::default().fg(Color::Rgb(147, 147, 147)),
-            ),
-            Span::styled(
-                "systems programming",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
-            Span::styled(
-                ", specifically working with ",
-                Style::default().fg(Color::Rgb(147, 147, 147)),
-            ),
-            Span::styled(
-                "embedded Rust on microcontrollers",
-                Style::default().fg(Color::Rgb(255, 255, 255)),
-            ),
+            gray_span("im currently exploring "),
+            white_span("systems programming"),
+            gray_span(", specifically working with "),
+            white_span("embedded Rust on microcontrollers"),
         ]);
 
         let line_items: Vec<Span> = (0..(self.links.len() * 2) - 1)
             .map(move |index| {
                 if (index + 1) % 2 == 0 {
-                    return Span::styled(" - ", Style::default().fg(Color::Rgb(147, 147, 147)));
+                    return gray_span(" - ");
                 }
 
                 let style_config = match index / 2 == self.state {
-                    true => Style::default().fg(Color::Rgb(0, 255, 251)).underlined(),
-                    false => Style::default().fg(Color::Rgb(147, 147, 147)),
+                    true => accent_underlined_style(),
+                    false => gray_style(),
                 };
 
                 let display_text = self.links[index / 2].display_text.to_owned();
