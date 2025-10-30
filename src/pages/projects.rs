@@ -11,6 +11,7 @@ use crate::pages::style::{gray_span, gray_style, line_from_spans, selected_style
 
 struct ProjectItem {
     name: &'static str,
+    link: &'static str,
     project_type: &'static str,
     prizes: Vec<&'static str>,
     description: Vec<&'static str>,
@@ -24,6 +25,7 @@ impl ProjectItem {
 
 pub struct Projects {
     state: usize,
+    current_link: String,
     projects: Vec<ProjectItem>,
 }
 
@@ -82,6 +84,9 @@ impl Page for Projects {
             KeyCode::Char('j') => {
                 self.next_project();
             }
+            KeyCode::Enter => {
+                open::that(&self.current_link).unwrap();
+            }
             _ => {}
         }
     }
@@ -92,6 +97,7 @@ impl Projects {
         let projects = vec![
             ProjectItem {
                 name: "ecollm",
+                link: "https://devpost.com/software/ecollm",
                 prizes: vec!["🏆 best social impact"],
                 description: vec![
                     "an adaptive ai model training tool for llms, optimized to minimize carbon footprint",
@@ -102,6 +108,7 @@ impl Projects {
             },
             ProjectItem {
                 name: "dependapou",
+                link: "https://devpost.com/software/depend-a-pou",
                 prizes: vec![
                     "🏆 best software dev tool (sponsored by warp)",
                     "🏆 best use of modal (Sponsored by modal labs)",
@@ -117,6 +124,7 @@ impl Projects {
             },
             ProjectItem {
                 name: "ootd, outfit of the day",
+                link: "https://devpost.com/software/ootd-outfit-of-the-day",
                 prizes: vec!["🏆 zero waste award (sustainability track)"],
                 description: vec![
                     "the all-in-one social media fashion app",
@@ -127,6 +135,7 @@ impl Projects {
             },
             ProjectItem {
                 name: "manny-bot",
+                link: "https://github.com/kllarena07/safa-message-scheduler",
                 prizes: vec![],
                 description: vec![
                     "a web dashboard for scheduling discord announcements, built for the student association for filipino americans at um-dearborn",
@@ -139,6 +148,7 @@ impl Projects {
             },
             ProjectItem {
                 name: "sheltr",
+                link: "https://devpost.com/software/sheltr-xoz357",
                 prizes: vec!["🏆 2nd place winner overall"],
                 description: vec![
                     "a real-time crowdsourced disaster-management platform aimed to help both locals and responders during the january 2025 southern california wildfires",
@@ -149,6 +159,7 @@ impl Projects {
             },
             ProjectItem {
                 name: "youtube copilot",
+                link: "https://github.com/kllarena07/yt-copilot",
                 prizes: vec!["🏆 5th place winner overall"],
                 description: vec![
                     "a chrome extension that enables ai conversations with youtube videos",
@@ -159,6 +170,7 @@ impl Projects {
             },
             ProjectItem {
                 name: "safety blanket",
+                link: "https://devpost.com/software/safety-blanket-vyp089",
                 prizes: vec![],
                 description: vec![
                     "a virtual companion app built to provide security for women traveling at night",
@@ -173,7 +185,11 @@ impl Projects {
             },
         ];
 
-        Self { state: 0, projects }
+        Self {
+            state: 0,
+            current_link: String::from(projects[0].link),
+            projects,
+        }
     }
 
     fn get_description(&self) -> Vec<Line<'_>> {
@@ -199,12 +215,18 @@ impl Projects {
     fn previous_project(&mut self) {
         if self.state > 0 {
             self.state -= 1;
+            self.change_current_link();
         }
     }
 
     fn next_project(&mut self) {
         if self.state < self.projects.len() - 1 {
             self.state += 1;
+            self.change_current_link();
         }
+    }
+
+    fn change_current_link(&mut self) {
+        self.current_link = String::from(self.projects[self.state].link);
     }
 }
