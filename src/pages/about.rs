@@ -51,11 +51,6 @@ impl<'a> Page for About<'a> {
             white_span("may 2027"),
         ]);
 
-        let line_5 = line_from_spans(vec![
-            gray_span("my background is rooted in "),
-            white_span("web and mobile fullstack development"),
-        ]);
-
         let line_4 = line_from_spans(vec![
             gray_span("i thrive best in environments that value "),
             white_span("high velocity "),
@@ -63,16 +58,19 @@ impl<'a> Page for About<'a> {
             white_span("strong ownership"),
         ]);
 
+        let line_5 = line_from_spans(vec![
+            gray_span("my background is rooted in "),
+            white_span("web and mobile fullstack development"),
+            gray_span(", all "),
+            white_span("self-taught"),
+            gray_span(" through research, experimentation, and project work"),
+        ]);
+
         let line_6 = line_from_spans(vec![
             gray_span("im currently exploring "),
             white_span("systems programming"),
             gray_span(", specifically working with "),
             white_span("embedded Rust on microcontrollers"),
-        ]);
-
-        let line_6 = line_from_spans(vec![
-            gray_span("all of my achievements have been "),
-            white_span("self-taught"),
         ]);
 
         let line_items: Vec<Span> = (0..(self.links.len() * 2) - 1)
