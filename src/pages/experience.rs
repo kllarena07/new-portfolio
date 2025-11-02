@@ -8,6 +8,7 @@ use ratatui::{
 };
 
 use crate::pages::style::{gray_span, gray_style, line_from_spans, selected_style, white_span};
+use crate::pages::{labels::container::LabelContainer, labels::expo::Expo, page::Page};
 
 struct ExperienceItem {
     role: &'static str,
@@ -206,19 +207,23 @@ impl Page for Experience {
         // Render the description paragraph
         frame.render_widget(paragraph, text_area);
 
-        // Render the tech block with white outline
-        let tech_block = Block::new()
-            .title("tech")
-            .borders(Borders::ALL)
-            .border_style(Style::default().fg(Color::Rgb(255, 255, 255)))
-            .padding(Padding {
-                left: 1,
-                right: 1,
-                top: 0,
-                bottom: 0,
-            });
+        // let tech_block = Block::new()
+        //     .title("tech")
+        //     .borders(Borders::ALL)
+        //     .border_style(Style::default().fg(Color::Rgb(255, 255, 255)))
+        //     .padding(Padding {
+        //         left: 1,
+        //         right: 1,
+        //         top: 0,
+        //         bottom: 0,
+        //     });
 
-        frame.render_widget(tech_block, tech_area);
+        // frame.render_widget(tech_block, tech_area);
+
+        // Create and render label container
+        let labels = vec![Expo::build(), Expo::build()];
+        let container = LabelContainer::new(labels);
+        container.render(frame, tech_area);
     }
 
     fn keyboard_event_handler(&mut self, key_code: KeyCode) {
