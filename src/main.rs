@@ -97,7 +97,7 @@ impl App {
     }
 
     fn draw(&mut self, frame: &mut Frame) {
-        let [vertical_area] = Layout::vertical([Constraint::Percentage(35)])
+        let [vertical_area] = Layout::vertical([Constraint::Percentage(50)])
             .flex(Flex::Center)
             .areas(frame.area());
         let [left_area, center_area, right_area] = Layout::horizontal([
