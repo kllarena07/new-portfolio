@@ -103,7 +103,7 @@ impl App {
         let [left_area, center_area, right_area] = Layout::horizontal([
             Constraint::Fill(1),
             Constraint::Max(80),
-            Constraint::Fill(1),
+            Constraint::Fill(2),
         ])
         .flex(Flex::Center)
         .areas(vertical_area);
