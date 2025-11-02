@@ -1,13 +1,12 @@
 use crossterm::event::KeyCode;
 use ratatui::{
     Frame,
-    layout::Constraint,
-    layout::Rect,
+    layout::{Constraint, Layout, Rect},
+    style::{Color, Style},
     text::Line,
-    widgets::{Block, Cell, Padding, Paragraph, Row, Table, Wrap},
+    widgets::{Block, Borders, Cell, Padding, Paragraph, Row, Table, Wrap},
 };
 
-use crate::pages::page::Page;
 use crate::pages::style::{gray_span, gray_style, line_from_spans, selected_style, white_span};
 
 struct ExperienceItem {
@@ -189,8 +188,37 @@ impl Page for Experience {
         let mut description = self.get_description();
         description.insert(0, line_from_spans(vec![white_span("desc")]));
 
+        // Create the paragraph with wrapping
         let paragraph = Paragraph::new(description).wrap(Wrap { trim: true });
-        frame.render_widget(paragraph, area);
+
+        // Calculate the actual height needed using line_count
+        let text_height = paragraph.line_count(area.width);
+        let available_height = area.height;
+
+        // Ensure we don't exceed available height and reserve space for tech block
+        let actual_text_height = (text_height as u16).min(available_height.saturating_sub(4));
+
+        // Split the area: text area + tech block area
+        let [text_area, tech_area] =
+            Layout::vertical([Constraint::Length(actual_text_height), Constraint::Fill(1)])
+                .areas(area);
+
+        // Render the description paragraph
+        frame.render_widget(paragraph, text_area);
+
+        // Render the tech block with white outline
+        let tech_block = Block::new()
+            .title("tech")
+            .borders(Borders::ALL)
+            .border_style(Style::default().fg(Color::Rgb(255, 255, 255)))
+            .padding(Padding {
+                left: 1,
+                right: 1,
+                top: 0,
+                bottom: 0,
+            });
+
+        frame.render_widget(tech_block, tech_area);
     }
 
     fn keyboard_event_handler(&mut self, key_code: KeyCode) {

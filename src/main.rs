@@ -111,6 +111,7 @@ impl App {
         let [menu_area] = Layout::vertical([Constraint::Max(menu_height)]).areas(left_area);
         let [vcanvas_area] = Layout::vertical([Constraint::Max(15)]).areas(right_area);
         let [canvas_area] = Layout::horizontal([Constraint::Max(50)]).areas(vcanvas_area);
+        let [additional_area] = Layout::horizontal([Constraint::Max(50)]).areas(right_area);
 
         // frame.render_widget(
         //     Block::new()
@@ -131,7 +132,14 @@ impl App {
         //         .fg(Color::Blue)
         //         .title("Right")
         //         .borders(Borders::ALL),
-        //     canvas_area,
+        //     aa1,
+        // );
+        // frame.render_widget(
+        //     Block::new()
+        //         .fg(Color::Blue)
+        //         .title("Right")
+        //         .borders(Borders::ALL),
+        //     additional_area,
         // );
 
         let menu_widget = self.build_menu_widget();
@@ -139,7 +147,10 @@ impl App {
 
         if let Some(current_page) = self.pages.get(self.selected_page) {
             current_page.render(frame, center_area);
-            current_page.render_additional(frame, canvas_area);
+            match self.selected_page == 0 {
+                true => current_page.render_additional(frame, canvas_area),
+                false => current_page.render_additional(frame, additional_area),
+            }
         }
     }
 
