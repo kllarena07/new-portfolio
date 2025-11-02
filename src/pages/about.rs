@@ -70,7 +70,7 @@ impl<'a> Page for About<'a> {
             gray_span("im currently exploring "),
             white_span("systems programming"),
             gray_span(", specifically working with "),
-            white_span("embedded Rust on microcontrollers"),
+            white_span("embedded rust on microcontrollers"),
         ]);
 
         let line_items: Vec<Span> = (0..(self.links.len() * 2) - 1)
