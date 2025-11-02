@@ -27,7 +27,7 @@ impl LabelContainer {
 
             // Check if we need to wrap to the next line
             if current_x + label_width > area.x + area.width {
-                current_y += 1;
+                current_y += 2; // +2 for 1px vertical spacing
                 current_x = area.x;
 
                 // Stop if we've run out of vertical space
@@ -46,8 +46,8 @@ impl LabelContainer {
 
             frame.render_widget(label.to_paragraph(), label_area);
 
-            // Move to the next position (label width + 1 for spacing)
-            current_x += label_width + 1;
+            // Move to the next position (label width + 2 for spacing)
+            current_x += label_width + 2;
         }
     }
 }
