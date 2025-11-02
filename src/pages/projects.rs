@@ -111,7 +111,7 @@ impl Projects {
                 link: "https://devpost.com/software/depend-a-pou",
                 prizes: vec![
                     "🏆 best software dev tool (sponsored by warp)",
-                    "🏆 best use of modal (Sponsored by modal labs)",
+                    "🏆 best use of modal (sponsored by modal labs)",
                 ],
                 description: vec![
                     "a developer tool that uses llms to ensure developers are shipping instead of maintaining",
@@ -140,7 +140,7 @@ impl Projects {
                 description: vec![
                     "a web dashboard for scheduling discord announcements, built for the student association for filipino americans at um-dearborn",
                     "",
-                    "the dashboard, locked behind authentication, is split into two sections: composer and previewer. the composer supports markdown input and file uploads while the previewer renders the output",
+                    "the dashboard, locked behind authentication, is split into two sections: a composer that supports markdown input and file uploads and a previewer that renders the output",
                     "",
                     "upon scheduling, media assets are persisted to s3 and an eventbridge schedule is created with a payload (s3 urls + message body). at runtime, the schedule invokes a lambda function, which reads the payload and publishes to a discord webhook",
                 ],
@@ -164,7 +164,7 @@ impl Projects {
                 description: vec![
                     "a chrome extension that enables ai conversations with youtube videos",
                     "",
-                    "leverages retrieval‑augmented generation (rag) over the video transcript and the active frame to provide context-aware answers to user prompts during playback",
+                    "leverages retrieval‑augmented generation over the video transcript and the active frame to provide context-aware answers to user prompts during playback",
                 ],
                 project_type: "hackathon (intel ai pc pilot program)",
             },
