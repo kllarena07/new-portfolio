@@ -1,5 +1,5 @@
 use crate::pages::labels::label::ColoredLabel;
-use ratatui::style::{Color, Style};
+use ratatui::style::Color;
 
 pub struct Supabase {}
 
