@@ -6,8 +6,17 @@ use ratatui::{
     widgets::{Block, Cell, Padding, Paragraph, Row, Table, Wrap},
 };
 
-use crate::pages::style::{gray_span, gray_style, line_from_spans, selected_style, white_span};
-use crate::pages::{labels::container::LabelContainer, labels::expo::Expo, page::Page};
+use crate::pages::{
+    labels::{
+        cloudflare::{images::CloudflareImages, workers::CloudflareWorkers},
+        supabase::Supabase,
+    },
+    style::{gray_span, gray_style, line_from_spans, selected_style, white_span},
+};
+use crate::pages::{
+    labels::{container::LabelContainer, expo::Expo, react::react_native::ReactNative},
+    page::Page,
+};
 
 struct ExperienceItem {
     role: &'static str,
@@ -201,6 +210,7 @@ impl Page for Experience {
         // Split the area: text area + tech block area
         let [text_area, tech_area] =
             Layout::vertical([Constraint::Length(actual_text_height), Constraint::Fill(1)])
+                .spacing(1)
                 .areas(area);
 
         // Render the description paragraph
@@ -220,7 +230,13 @@ impl Page for Experience {
         // frame.render_widget(tech_block, tech_area);
 
         // Create and render label container
-        let labels = vec![Expo::build(), Expo::build()];
+        let labels = vec![
+            Expo::build(),
+            Supabase::build(),
+            ReactNative::build(),
+            CloudflareImages::build(),
+            CloudflareWorkers::build(),
+        ];
         let container = LabelContainer::new(labels);
         container.render(frame, tech_area);
     }
