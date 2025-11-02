@@ -10,6 +10,7 @@ use crate::pages::{
     labels::{
         cloudflare::{images::CloudflareImages, workers::CloudflareWorkers},
         supabase::Supabase,
+        vexo_analytics::VexoAnalytics,
     },
     style::{gray_span, gray_style, line_from_spans, selected_style, white_span},
 };
@@ -236,6 +237,7 @@ impl Page for Experience {
             ReactNative::build(),
             CloudflareImages::build(),
             CloudflareWorkers::build(),
+            VexoAnalytics::build(),
         ];
         let container = LabelContainer::new(labels);
         container.render(frame, tech_area);
