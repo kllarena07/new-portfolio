@@ -16,7 +16,8 @@ impl ColoredLabel {
     }
 
     pub fn width(&self) -> u16 {
-        self.title.len() as u16
+        // text length + left padding + right padding
+        self.title.len() as u16 + 2
     }
 
     pub fn to_paragraph(&self) -> Paragraph<'static> {
@@ -25,8 +26,8 @@ impl ColoredLabel {
         let block_config = Block::new().padding(Padding {
             top: 0,
             bottom: 0,
-            left: 0,
-            right: 0,
+            left: 1,
+            right: 1,
         });
 
         Paragraph::new(title_text)
