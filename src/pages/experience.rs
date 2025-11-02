@@ -2,9 +2,8 @@ use crossterm::event::KeyCode;
 use ratatui::{
     Frame,
     layout::{Constraint, Layout, Rect},
-    style::{Color, Style},
     text::Line,
-    widgets::{Block, Borders, Cell, Padding, Paragraph, Row, Table, Wrap},
+    widgets::{Block, Cell, Padding, Paragraph, Row, Table, Wrap},
 };
 
 use crate::pages::style::{gray_span, gray_style, line_from_spans, selected_style, white_span};
