@@ -1169,6 +1169,7 @@ dependencies = [
  "image",
  "open",
  "ratatui",
+ "rayon",
 ]
 
 [[package]]
