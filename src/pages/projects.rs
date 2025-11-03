@@ -8,12 +8,29 @@ use ratatui::{
 };
 
 use crate::pages::{
-    labels::{aws::s3::S3, nextjs::NextJS, typescript::TypeScript},
-    style::{gray_span, gray_style, line_from_spans, selected_style, white_span},
-};
-use crate::pages::{
-    labels::{aws::sagemaker::SageMaker, label::ColoredLabel},
+    labels::{
+        aws::{
+            eventbridge_scheduler::EventBridgeScheduler, lambda::Lambda, s3::S3,
+            sagemaker::SageMaker,
+        },
+        fastapi::FastAPI,
+        flask::Flask,
+        groq::Groq,
+        javascript::JavaScript,
+        kinde_auth::KindeAuth,
+        label::ColoredLabel,
+        modal::Modal,
+        nextjs::NextJS,
+        pinecone::Pinecone,
+        python::Python,
+        retell_ai::RetellAI,
+        supabase::Supabase,
+        tailwind::Tailwind,
+        typescript::TypeScript,
+        websocket::WebSocket,
+    },
     page::Page,
+    style::{gray_span, gray_style, line_from_spans, selected_style, white_span},
 };
 
 struct ProjectItem {
@@ -164,7 +181,13 @@ impl Projects {
                     "auto-generates refactor prs and provides an insights dashboard for end‑to‑end visibility and control",
                 ],
                 project_type: "hackathon (columbia devfest 2025)",
-                technologies: vec![],
+                technologies: vec![
+                    FastAPI::build(),
+                    Groq::build(),
+                    Modal::build(),
+                    NextJS::build(),
+                    Tailwind::build(),
+                ],
             },
             ProjectItem {
                 name: "ootd, outfit of the day",
@@ -176,6 +199,12 @@ impl Projects {
                     "users can share their outfits, explore and vote on looks from others, try clothes on virtually, and shop their favorite pieces",
                 ],
                 project_type: "hackathon (msu spartahack x)",
+                technologies: vec![
+                    NextJS::build(),
+                    Supabase::build(),
+                    TypeScript::build(),
+                    Tailwind::build(),
+                ],
             },
             ProjectItem {
                 name: "manny-bot",
@@ -189,6 +218,14 @@ impl Projects {
                     "upon scheduling, media assets are persisted to s3 and an eventbridge schedule is created with a payload (s3 urls + message body). at runtime, the schedule invokes a lambda function, which reads the payload and publishes to a discord webhook",
                 ],
                 project_type: "personal",
+                technologies: vec![
+                    NextJS::build(),
+                    TypeScript::build(),
+                    S3::build(),
+                    Lambda::build(),
+                    EventBridgeScheduler::build(),
+                    KindeAuth::build(),
+                ],
             },
             ProjectItem {
                 name: "sheltr",
@@ -200,6 +237,12 @@ impl Projects {
                     "users can view a live feed of nearby emergencies, submit location‑based disaster reports with key details, and see prioritized updates based on community engagement",
                 ],
                 project_type: "hackathon (waynehacks 3)",
+                technologies: vec![
+                    NextJS::build(),
+                    Supabase::build(),
+                    TypeScript::build(),
+                    Tailwind::build(),
+                ],
             },
             ProjectItem {
                 name: "youtube copilot",
@@ -211,6 +254,13 @@ impl Projects {
                     "leverages retrieval‑augmented generation over the video transcript and the active frame to provide context-aware answers to user prompts during playback",
                 ],
                 project_type: "hackathon (intel ai pc pilot program)",
+                technologies: vec![
+                    Pinecone::build(),
+                    Flask::build(),
+                    Python::build(),
+                    JavaScript::build(),
+                    WebSocket::build(),
+                ],
             },
             ProjectItem {
                 name: "safety blanket",
@@ -226,6 +276,16 @@ impl Projects {
                     "3. voice-call interface that simulates talking to a real person, with safe-word detection",
                 ],
                 project_type: "hackathon (venushacks 2024)",
+                technologies: vec![
+                    NextJS::build(),
+                    Flask::build(),
+                    WebSocket::build(),
+                    RetellAI::build(),
+                    Python::build(),
+                    Supabase::build(),
+                    TypeScript::build(),
+                    Tailwind::build(),
+                ],
             },
         ];
 
