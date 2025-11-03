@@ -227,7 +227,7 @@ impl<'a> About<'a> {
 }
 
 fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
-    const LIMIT_TO_10_FRAMES: bool = true; // Set to true to only load first 10 frames
+    const LIMIT_TO_10_FRAMES: bool = false; // Set to true to only load first 10 frames
     let mut all_frames = Vec::new();
 
     // Read all frame files from hikari directory
