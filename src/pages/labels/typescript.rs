@@ -7,6 +7,6 @@ const TYPESCRIPT_BG: Color = Color::Rgb(69, 119, 194);
 
 impl TypeScript {
     pub fn build() -> ColoredLabel {
-        ColoredLabel::new("vexo analytics", WHITE, TYPESCRIPT_BG)
+        ColoredLabel::new("typescript", WHITE, TYPESCRIPT_BG)
     }
 }
