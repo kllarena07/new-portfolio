@@ -11,6 +11,7 @@ use ratatui::{
     widgets::canvas::{Canvas, Points},
     widgets::{Block, Padding, Paragraph, Wrap},
 };
+use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
 use std::fs;
 
 #[derive(Clone)]
@@ -228,7 +229,6 @@ impl<'a> About<'a> {
 
 fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
     const LIMIT_TO_10_FRAMES: bool = false; // Set to true to only load first 10 frames
-    let mut all_frames = Vec::new();
 
     // Read all frame files from hikari directory
     let mut frame_files = Vec::new();
@@ -268,38 +268,44 @@ fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
         println!("{}: {}", i, path.file_name().unwrap().to_string_lossy());
     }
 
-    // Process each frame
+    // Process each frame in parallel using rayon
     let frames_to_process = if LIMIT_TO_10_FRAMES {
         frame_files.into_iter().take(10).collect()
     } else {
         frame_files
     };
 
-    for frame_path in frames_to_process {
-        if let Ok(img) = ImageReader::open(&frame_path) {
-            if let Ok(decoded_img) = img.decode() {
-                // Resize to square dimensions
-                let resized_img =
-                    decoded_img.resize(112, 112, image::imageops::FilterType::Lanczos3);
-                let rgb_img = resized_img.to_rgb8();
-                let (width, height) = rgb_img.dimensions();
+    let all_frames: Vec<Vec<Vec<[u8; 3]>>> = frames_to_process
+        .par_iter()
+        .filter_map(|frame_path| {
+            ImageReader::open(frame_path)
+                .ok()?
+                .decode()
+                .ok()
+                .map(|decoded_img| {
+                    // Resize to square dimensions
+                    let resized_img =
+                        decoded_img.resize(112, 112, image::imageops::FilterType::Lanczos3);
+                    let rgb_img = resized_img.to_rgb8();
+                    let (width, height) = rgb_img.dimensions();
 
-                // Create 2D array to store RGB values for this frame
-                let mut pixel_rgb_val_map: Vec<Vec<[u8; 3]>> = Vec::with_capacity(height as usize);
+                    // Create 2D array to store RGB values for this frame
+                    let pixel_rgb_val_map: Vec<Vec<[u8; 3]>> = (0..height)
+                        .into_par_iter()
+                        .map(|y| {
+                            (0..width)
+                                .map(|x| {
+                                    let pixel = rgb_img.get_pixel(x, y);
+                                    [pixel[0], pixel[1], pixel[2]]
+                                })
+                                .collect()
+                        })
+                        .collect();
 
-                for y in 0..height {
-                    let mut row: Vec<[u8; 3]> = Vec::with_capacity(width as usize);
-                    for x in 0..width {
-                        let pixel = rgb_img.get_pixel(x, y);
-                        row.push([pixel[0], pixel[1], pixel[2]]);
-                    }
-                    pixel_rgb_val_map.push(row);
-                }
-
-                all_frames.push(pixel_rgb_val_map);
-            }
-        }
-    }
+                    pixel_rgb_val_map
+                })
+        })
+        .collect();
 
     all_frames
 }
