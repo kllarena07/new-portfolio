@@ -1,7 +1,4 @@
-use crate::pages::{
-    labels::label::ColoredLabel,
-    style::{BLACK, WHITE},
-};
+use crate::pages::{labels::label::ColoredLabel, style::WHITE};
 use ratatui::style::Color;
 
 pub struct WebSocket {}
