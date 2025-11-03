@@ -9,7 +9,9 @@ use ratatui::{
 use crate::pages::{
     labels::{
         cloudflare::{images::CloudflareImages, workers::CloudflareWorkers},
+        label::ColoredLabel,
         supabase::Supabase,
+        typescript::TypeScript,
         vexo_analytics::VexoAnalytics,
     },
     style::{gray_span, gray_style, line_from_spans, selected_style, white_span},
@@ -24,6 +26,7 @@ struct ExperienceItem {
     affiliation: &'static str,
     time: &'static str,
     description: Vec<&'static str>,
+    technologies: Vec<ColoredLabel>,
 }
 
 impl ExperienceItem {
@@ -55,6 +58,15 @@ impl Experience {
                     "",
                     "notable highlights:",
                     "- achieved a 3x boost in dau retention by analyzing user behavior patterns and implementing targeted push notifications",
+                ],
+                technologies: vec![
+                    Expo::build(),
+                    Supabase::build(),
+                    ReactNative::build(),
+                    CloudflareImages::build(),
+                    CloudflareWorkers::build(),
+                    VexoAnalytics::build(),
+                    TypeScript::build(),
                 ],
             },
             ExperienceItem {
