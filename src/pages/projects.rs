@@ -2,9 +2,8 @@ use crossterm::event::KeyCode;
 use ratatui::{
     Frame,
     layout::{Constraint, Layout, Rect},
-    style::{Color, Style},
     text::Line,
-    widgets::{Block, Borders, Cell, Padding, Paragraph, Row, Table, Wrap},
+    widgets::{Block, Cell, Padding, Paragraph, Row, Table, Wrap},
 };
 
 use crate::pages::{
@@ -13,6 +12,7 @@ use crate::pages::{
             eventbridge_scheduler::EventBridgeScheduler, lambda::Lambda, s3::S3,
             sagemaker::SageMaker,
         },
+        container::LabelContainer,
         fastapi::FastAPI,
         flask::Flask,
         groq::Groq,
@@ -32,7 +32,6 @@ use crate::pages::{
     page::Page,
     style::{gray_span, gray_style, line_from_spans, selected_style, white_span},
 };
-
 struct ProjectItem {
     name: &'static str,
     link: &'static str,
@@ -110,24 +109,16 @@ impl Page for Projects {
         // Split the area: text area + tech block area
         let [text_area, tech_area] =
             Layout::vertical([Constraint::Length(actual_text_height), Constraint::Fill(1)])
+                .spacing(1)
                 .areas(area);
 
         // Render the description paragraph
         frame.render_widget(paragraph, text_area);
 
-        // Render the tech block with white outline
-        let tech_block = Block::new()
-            .title("tech")
-            .borders(Borders::ALL)
-            .border_style(Style::default().fg(Color::Rgb(255, 255, 255)))
-            .padding(Padding {
-                left: 1,
-                right: 1,
-                top: 0,
-                bottom: 0,
-            });
-
-        frame.render_widget(tech_block, tech_area);
+        // Create and render label container with technologies from current project
+        let project_item = &self.projects[self.state];
+        let container = LabelContainer::new(&project_item.technologies);
+        container.render(frame, tech_area);
     }
 
     fn keyboard_event_handler(&mut self, key_code: KeyCode) {
