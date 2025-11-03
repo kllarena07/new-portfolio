@@ -253,16 +253,9 @@ impl Page for Experience {
 
         // frame.render_widget(tech_block, tech_area);
 
-        // Create and render label container
-        let labels = vec![
-            Expo::build(),
-            Supabase::build(),
-            ReactNative::build(),
-            CloudflareImages::build(),
-            CloudflareWorkers::build(),
-            VexoAnalytics::build(),
-        ];
-        let container = LabelContainer::new(labels);
+        // Create and render label container with technologies from current experience
+        let experience_item = &self.experiences[self.state];
+        let container = LabelContainer::new(&experience_item.technologies);
         container.render(frame, tech_area);
     }
 

@@ -2,12 +2,12 @@ use ratatui::{Frame, layout::Rect};
 
 use super::label::ColoredLabel;
 
-pub struct LabelContainer {
-    labels: Vec<ColoredLabel>,
+pub struct LabelContainer<'a> {
+    labels: &'a [ColoredLabel],
 }
 
-impl LabelContainer {
-    pub fn new(labels: Vec<ColoredLabel>) -> Self {
+impl<'a> LabelContainer<'a> {
+    pub fn new(labels: &'a [ColoredLabel]) -> Self {
         Self { labels }
     }
 
@@ -19,7 +19,7 @@ impl LabelContainer {
         let mut current_x = area.x;
         let mut current_y = area.y;
 
-        for label in &self.labels {
+        for label in self.labels {
             let label_width = label.width();
 
             // Check if we need to wrap to the next line
