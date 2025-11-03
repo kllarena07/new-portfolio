@@ -1,8 +1,10 @@
+pub mod aws;
 pub mod cloudflare;
 pub mod container;
 pub mod expo;
 pub mod javascript;
 pub mod label;
+pub mod nextjs;
 pub mod pocketbase;
 pub mod react;
 pub mod supabase;

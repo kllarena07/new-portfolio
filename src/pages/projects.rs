@@ -7,8 +7,14 @@ use ratatui::{
     widgets::{Block, Borders, Cell, Padding, Paragraph, Row, Table, Wrap},
 };
 
-use crate::pages::page::Page;
-use crate::pages::style::{gray_span, gray_style, line_from_spans, selected_style, white_span};
+use crate::pages::{
+    labels::{aws::s3::S3, nextjs::NextJS, typescript::TypeScript},
+    style::{gray_span, gray_style, line_from_spans, selected_style, white_span},
+};
+use crate::pages::{
+    labels::{aws::sagemaker::SageMaker, label::ColoredLabel},
+    page::Page,
+};
 
 struct ProjectItem {
     name: &'static str,
@@ -16,6 +22,7 @@ struct ProjectItem {
     project_type: &'static str,
     prizes: Vec<&'static str>,
     description: Vec<&'static str>,
+    technologies: Vec<ColoredLabel>,
 }
 
 impl ProjectItem {
@@ -135,6 +142,12 @@ impl Projects {
                     "persists training epochs/checkpoints to aws s3 and orchestrates aws sagemaker jobs while dynamically rebalancing workloads across aws regions in real time to reduce carbon emissions",
                 ],
                 project_type: "hackathon (revolutionuc 2025)",
+                technologies: vec![
+                    NextJS::build(),
+                    TypeScript::build(),
+                    SageMaker::build(),
+                    S3::build(),
+                ],
             },
             ProjectItem {
                 name: "dependapou",
@@ -151,6 +164,7 @@ impl Projects {
                     "auto-generates refactor prs and provides an insights dashboard for end‑to‑end visibility and control",
                 ],
                 project_type: "hackathon (columbia devfest 2025)",
+                technologies: vec![],
             },
             ProjectItem {
                 name: "ootd, outfit of the day",
