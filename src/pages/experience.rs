@@ -9,8 +9,13 @@ use ratatui::{
 use crate::pages::{
     labels::{
         cloudflare::{images::CloudflareImages, workers::CloudflareWorkers},
+        javascript::JavaScript,
         label::ColoredLabel,
+        pocketbase::PocketBase,
+        react::react::React,
         supabase::Supabase,
+        sveltekit::SvelteKit,
+        tailwind::Tailwind,
         typescript::TypeScript,
         vexo_analytics::VexoAnalytics,
     },
@@ -48,6 +53,7 @@ impl Experience {
                 affiliation: "capital one",
                 time: "(jun 2026-aug 2026)",
                 description: vec!["incoming summer 2026 under the tip program"],
+                technologies: vec![],
             },
             ExperienceItem {
                 role: "ceo / cto",
@@ -79,6 +85,7 @@ impl Experience {
                     "notable highlights:",
                     "- created a digital enrollment status badge to help reduce capital one agent call times by 12%",
                 ],
+                technologies: vec![JavaScript::build()],
             },
             ExperienceItem {
                 role: "mobile app dev",
@@ -93,6 +100,7 @@ impl Experience {
                     "- deployed to the ios app store as 'power um-d'",
                     "- supported 80+ attendees",
                 ],
+                technologies: vec![Expo::build(), TypeScript::build(), Supabase::build()],
             },
             ExperienceItem {
                 role: "frontend dev",
@@ -104,6 +112,7 @@ impl Experience {
                     "notable highlights:",
                     "- website drove 300+ event attendees",
                 ],
+                technologies: vec![JavaScript::build(), React::build(), Tailwind::build()],
             },
             ExperienceItem {
                 role: "fullstack dev",
@@ -115,6 +124,7 @@ impl Experience {
                     "notable highlights:",
                     "- engaged an audience of 2500+ followers",
                 ],
+                technologies: vec![SvelteKit::build(), PocketBase::build(), JavaScript::build()],
             },
             ExperienceItem {
                 role: "incubatee",
@@ -126,6 +136,7 @@ impl Experience {
                     "notable highlights:",
                     "- won $500 by placing 2nd place out of 21 other teams",
                 ],
+                technologies: vec![JavaScript::build(), React::build(), Tailwind::build()],
             },
         ];
 

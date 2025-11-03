@@ -1,8 +1,12 @@
 pub mod cloudflare;
 pub mod container;
 pub mod expo;
+pub mod javascript;
 pub mod label;
+pub mod pocketbase;
 pub mod react;
 pub mod supabase;
+pub mod sveltekit;
+pub mod tailwind;
 pub mod typescript;
 pub mod vexo_analytics;
