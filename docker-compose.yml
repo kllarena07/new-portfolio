@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  portfolio:
+    build: .
+    ports:
+      - "2222:22"
+    volumes:
+      - ./authorized_keys:/home/portfolio/.ssh/authorized_keys:ro
+    restart: unless-stopped
