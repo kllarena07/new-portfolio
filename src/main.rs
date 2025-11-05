@@ -4,7 +4,7 @@ use ratatui::{
     layout::{Constraint, Flex, Layout},
     style::{Color, Style, Stylize},
     symbols,
-    text::Span,
+    text::{Line, Span},
     widgets::{Block, Borders, List, ListItem, Padding},
 };
 use std::{io, sync::mpsc, thread, time::Duration};
@@ -12,7 +12,11 @@ use std::{io, sync::mpsc, thread, time::Duration};
 mod pages;
 use pages::{about::About, experience::Experience, page::Page};
 
-use crate::pages::{leadership::Leadership, projects::Projects};
+use crate::pages::{
+    leadership::Leadership,
+    projects::Projects,
+    style::{GRAY, WHITE},
+};
 
 fn main() -> io::Result<()> {
     let pages: Vec<Box<dyn Page>> = vec![
@@ -100,6 +104,15 @@ impl App {
         let [vertical_area] = Layout::vertical([Constraint::Percentage(50)])
             .flex(Flex::Center)
             .areas(frame.area());
+
+        let max_menu_width = self
+            .pages
+            .iter()
+            .map(|page| format!("[ {} ]", page.title()).len())
+            .max()
+            .unwrap_or(0) as u16
+            + 3; // +3 for right padding
+
         let [left_area, center_area, right_area] = Layout::horizontal([
             Constraint::Fill(1),
             Constraint::Max(80),
@@ -107,8 +120,15 @@ impl App {
         ])
         .flex(Flex::Center)
         .areas(vertical_area);
+
         let menu_height: u16 = (self.pages.len() + 2) as u16;
-        let [menu_area] = Layout::vertical([Constraint::Max(menu_height)]).areas(left_area);
+        let [menu_area, below_menu_full_area] =
+            Layout::vertical([Constraint::Max(menu_height), Constraint::Min(0)]).areas(left_area);
+
+        let [_, below_menu_area] =
+            Layout::horizontal([Constraint::Fill(1), Constraint::Max(max_menu_width)])
+                .areas(below_menu_full_area);
+
         let [vcanvas_area] = Layout::vertical([Constraint::Max(15)]).areas(right_area);
         let [canvas_area] = Layout::horizontal([Constraint::Max(50)]).areas(vcanvas_area);
         let [additional_area] = Layout::horizontal([Constraint::Max(50)]).areas(right_area);
@@ -119,6 +139,13 @@ impl App {
         //         .title("Left")
         //         .borders(Borders::ALL),
         //     left_area,
+        // );
+        // frame.render_widget(
+        //     Block::new()
+        //         .fg(Color::Green)
+        //         .title("Menu")
+        //         .borders(Borders::ALL),
+        //     menu_area,
         // );
         // frame.render_widget(
         //     Block::new()
@@ -144,6 +171,10 @@ impl App {
 
         let menu_widget = self.build_menu_widget();
         frame.render_widget(menu_widget, menu_area);
+
+        let nav_widget = self.build_nav_widget();
+
+        frame.render_widget(nav_widget, below_menu_area);
 
         if let Some(current_page) = self.pages.get(self.selected_page) {
             current_page.render(frame, center_area);
@@ -215,6 +246,36 @@ impl App {
                     left: 0,
                 }),
         );
+
+        final_list
+    }
+
+    fn build_nav_widget(&self) -> List<'_> {
+        let menu_items: Vec<ListItem> = vec![ListItem::new(Line::from(vec![
+            Span::styled("↑/↓ ", Style::default().fg(WHITE)),
+            Span::styled("page", Style::default().fg(GRAY)),
+        ]))];
+
+        // let menu_items: Vec<ListItem> = (0..self.pages.len())
+        //     .map(move |index| {
+        //         let title = self.pages[index].title();
+        //         let item_content = if index == self.selected_page {
+        //             format!("[ {} ]", title)
+        //         } else {
+        //             title.to_string()
+        //         };
+
+        //         let span = if index == self.selected_page {
+        //             Span::styled(item_content, Style::default().fg(Color::Rgb(255, 255, 255)))
+        //         } else {
+        //             Span::styled(item_content, Style::default().fg(Color::Rgb(147, 147, 147)))
+        //         };
+
+        //         ListItem::new(span.bold().into_right_aligned_line())
+        //     })
+        //     .collect();
+
+        let final_list = List::new(menu_items);
 
         final_list
     }
