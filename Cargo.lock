@@ -1054,6 +1054,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "portfolio-v2"
+version = "0.1.0"
+dependencies = [
+ "bincode",
+ "color-eyre",
+ "crossterm 0.29.0",
+ "image",
+ "open",
+ "ratatui",
+ "rayon",
+ "serde",
+]
+
+[[package]]
 name = "ppv-lite86"
 version = "0.2.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1178,20 +1192,6 @@ dependencies = [
  "unicode-segmentation",
  "unicode-truncate",
  "unicode-width 0.2.0",
-]
-
-[[package]]
-name = "ratatui-tutorial"
-version = "0.1.0"
-dependencies = [
- "bincode",
- "color-eyre",
- "crossterm 0.29.0",
- "image",
- "open",
- "ratatui",
- "rayon",
- "serde",
 ]
 
 [[package]]
