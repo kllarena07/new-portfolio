@@ -264,7 +264,7 @@ impl App {
         }
 
         let final_list = List::new(nav_lines).block(Block::new().padding(Padding {
-            left: 2,
+            left: 4,
             right: 0,
             top: 0,
             bottom: 0,
