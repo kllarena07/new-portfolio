@@ -1,5 +1,5 @@
 use crossterm::event::KeyCode;
-use ratatui::{Frame, layout::Rect};
+use ratatui::{Frame, layout::Rect, text::Line};
 
 pub trait Page {
     fn title(&self) -> &str;
@@ -8,5 +8,8 @@ pub trait Page {
     fn keyboard_event_handler(&mut self, key_code: KeyCode);
     fn on_tick(&mut self, _tick: u64) -> bool {
         false
+    }
+    fn nav_items(&self) -> Vec<Line<'static>> {
+        vec![]
     }
 }

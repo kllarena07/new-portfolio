@@ -270,4 +270,15 @@ impl Page for Experience {
             _ => {}
         }
     }
+
+    fn nav_items(&self) -> Vec<Line<'static>> {
+        use crate::pages::style::{GRAY, WHITE};
+        use ratatui::style::Style;
+        use ratatui::text::{Line, Span};
+
+        vec![Line::from(vec![
+            Span::styled("j/k ", Style::default().fg(WHITE)),
+            Span::styled("row", Style::default().fg(GRAY)),
+        ])]
+    }
 }

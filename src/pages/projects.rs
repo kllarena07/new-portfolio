@@ -2,7 +2,8 @@ use crossterm::event::KeyCode;
 use ratatui::{
     Frame,
     layout::{Constraint, Layout, Rect},
-    text::Line,
+    style::Style,
+    text::{Line, Span},
     widgets::{Block, Cell, Padding, Paragraph, Row, Table, Wrap},
 };
 
@@ -30,7 +31,7 @@ use crate::pages::{
         websocket::WebSocket,
     },
     page::Page,
-    style::{gray_span, gray_style, line_from_spans, selected_style, white_span},
+    style::{GRAY, WHITE, gray_span, gray_style, line_from_spans, selected_style, white_span},
 };
 struct ProjectItem {
     name: &'static str,
@@ -81,23 +82,27 @@ impl Page for Projects {
         });
 
         // Calculate max width needed for project type column
-        let max_project_type_len = self.projects
+        let max_project_type_len = self
+            .projects
             .iter()
             .map(|p| p.project_type.len())
             .max()
             .unwrap_or(0) as u16;
-        
-        let table = Table::new(rows, [
-            Constraint::Fill(1), 
-            Constraint::Length(max_project_type_len)
-        ])
-            .header(header)
-            .block(Block::new().padding(Padding {
-                left: 1,
-                right: 2,
-                top: 0,
-                bottom: 0,
-            }));
+
+        let table = Table::new(
+            rows,
+            [
+                Constraint::Fill(1),
+                Constraint::Length(max_project_type_len),
+            ],
+        )
+        .header(header)
+        .block(Block::new().padding(Padding {
+            left: 1,
+            right: 2,
+            top: 0,
+            bottom: 0,
+        }));
 
         frame.render_widget(table, area);
     }
@@ -144,6 +149,19 @@ impl Page for Projects {
             }
             _ => {}
         }
+    }
+
+    fn nav_items(&self) -> Vec<Line<'static>> {
+        vec![
+            Line::from(vec![
+                Span::styled("j/k ", Style::default().fg(WHITE)),
+                Span::styled("row", Style::default().fg(GRAY)),
+            ]),
+            Line::from(vec![
+                Span::styled(" ↵  ", Style::default().fg(WHITE)),
+                Span::styled("open", Style::default().fg(GRAY)),
+            ]),
+        ]
     }
 }
 

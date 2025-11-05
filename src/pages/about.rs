@@ -2,6 +2,7 @@ use crate::pages::page::Page;
 use crate::pages::style::{
     accent_underlined_style, gray_span, gray_style, line_from_spans, white_span,
 };
+use bincode::{Decode, Encode};
 use crossterm::event::KeyCode;
 use image::ImageReader;
 use ratatui::{
@@ -11,7 +12,6 @@ use ratatui::{
     widgets::canvas::{Canvas, Points},
     widgets::{Block, Padding, Paragraph, Wrap},
 };
-use bincode::{Decode, Encode};
 use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
 use std::fs;
 use std::io::{Read, Write};
@@ -175,6 +175,23 @@ impl<'a> Page for About<'a> {
         self.tick = tick;
         true
     }
+
+    fn nav_items(&self) -> Vec<Line<'static>> {
+        use crate::pages::style::{GRAY, WHITE};
+        use ratatui::style::Style;
+        use ratatui::text::{Line, Span};
+
+        vec![
+            Line::from(vec![
+                Span::styled("←/→ ", Style::default().fg(WHITE)),
+                Span::styled("link", Style::default().fg(GRAY)),
+            ]),
+            Line::from(vec![
+                Span::styled(" ↵  ", Style::default().fg(WHITE)),
+                Span::styled("open", Style::default().fg(GRAY)),
+            ]),
+        ]
+    }
 }
 
 impl<'a> About<'a> {
@@ -243,14 +260,17 @@ fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
     if Path::new(CACHE_FILE).exists() {
         println!("Loading frames from cache...");
         if let Ok(cached_frames) = load_frames_from_cache(CACHE_FILE) {
-            println!("Successfully loaded {} frames from cache", cached_frames.len());
+            println!(
+                "Successfully loaded {} frames from cache",
+                cached_frames.len()
+            );
             return cached_frames;
         }
         println!("Cache load failed, recalculating frames...");
     }
 
     println!("Cache not found, processing frames...");
-    
+
     // Read all frame files from hikari directory
     let mut frame_files = Vec::new();
     if let Ok(entries) = fs::read_dir("./hikari-dance") {
@@ -338,7 +358,10 @@ fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
     all_frames
 }
 
-fn save_frames_to_cache(frames: &[Vec<Vec<[u8; 3]>>], path: &str) -> Result<(), Box<dyn std::error::Error>> {
+fn save_frames_to_cache(
+    frames: &[Vec<Vec<[u8; 3]>>],
+    path: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
     let cache = FrameCache {
         frames: frames.to_vec(),
     };
@@ -349,7 +372,9 @@ fn save_frames_to_cache(frames: &[Vec<Vec<[u8; 3]>>], path: &str) -> Result<(), 
     Ok(())
 }
 
-fn load_frames_from_cache(path: &str) -> Result<Vec<Vec<Vec<[u8; 3]>>>, Box<dyn std::error::Error>> {
+fn load_frames_from_cache(
+    path: &str,
+) -> Result<Vec<Vec<Vec<[u8; 3]>>>, Box<dyn std::error::Error>> {
     let mut file = fs::File::open(path)?;
     let mut buffer = Vec::new();
     file.read_to_end(&mut buffer)?;

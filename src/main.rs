@@ -251,31 +251,24 @@ impl App {
     }
 
     fn build_nav_widget(&self) -> List<'_> {
-        let menu_items: Vec<ListItem> = vec![ListItem::new(Line::from(vec![
+        // Start with the static "page" navigation item
+        let mut nav_lines: Vec<ListItem> = vec![ListItem::new(Line::from(vec![
             Span::styled("↑/↓ ", Style::default().fg(WHITE)),
             Span::styled("page", Style::default().fg(GRAY)),
         ]))];
 
-        // let menu_items: Vec<ListItem> = (0..self.pages.len())
-        //     .map(move |index| {
-        //         let title = self.pages[index].title();
-        //         let item_content = if index == self.selected_page {
-        //             format!("[ {} ]", title)
-        //         } else {
-        //             title.to_string()
-        //         };
+        // Add page-specific nav items if they exist
+        if let Some(current_page) = self.pages.get(self.selected_page) {
+            let page_nav_items = current_page.nav_items();
+            nav_lines.extend(page_nav_items.into_iter().map(ListItem::new));
+        }
 
-        //         let span = if index == self.selected_page {
-        //             Span::styled(item_content, Style::default().fg(Color::Rgb(255, 255, 255)))
-        //         } else {
-        //             Span::styled(item_content, Style::default().fg(Color::Rgb(147, 147, 147)))
-        //         };
-
-        //         ListItem::new(span.bold().into_right_aligned_line())
-        //     })
-        //     .collect();
-
-        let final_list = List::new(menu_items);
+        let final_list = List::new(nav_lines).block(Block::new().padding(Padding {
+            left: 2,
+            right: 0,
+            top: 0,
+            bottom: 0,
+        }));
 
         final_list
     }
