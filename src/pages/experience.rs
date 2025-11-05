@@ -203,7 +203,7 @@ impl Page for Experience {
             [
                 Constraint::Fill(1),
                 Constraint::Fill(1),
-                Constraint::Fill(1),
+                Constraint::Length(19),
             ],
         )
         .header(header)

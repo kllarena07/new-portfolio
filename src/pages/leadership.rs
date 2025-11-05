@@ -119,7 +119,7 @@ impl Page for Leadership {
             [
                 Constraint::Fill(1),
                 Constraint::Fill(2),
-                Constraint::Fill(2),
+                Constraint::Length(19),
             ],
         )
         .header(header)
