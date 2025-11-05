@@ -1,11 +1,11 @@
 use crossterm::event::KeyCode;
 use ratatui::{
-    DefaultTerminal, Frame,
     layout::{Constraint, Flex, Layout},
     style::{Color, Style, Stylize},
     symbols,
     text::{Line, Span},
     widgets::{Block, Borders, List, ListItem, Padding},
+    DefaultTerminal, Frame,
 };
 use std::{io, sync::mpsc, thread, time::Duration};
 

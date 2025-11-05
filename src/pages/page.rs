@@ -1,5 +1,5 @@
 use crossterm::event::KeyCode;
-use ratatui::{Frame, layout::Rect, text::Line};
+use ratatui::{layout::Rect, text::Line, Frame};
 
 pub trait Page {
     fn title(&self) -> &str;

@@ -6,11 +6,11 @@ use bincode::{Decode, Encode};
 use crossterm::event::KeyCode;
 use image::ImageReader;
 use ratatui::{
-    Frame,
     layout::Rect,
     text::{Line, Span},
     widgets::canvas::{Canvas, Points},
     widgets::{Block, Padding, Paragraph, Wrap},
+    Frame,
 };
 use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
 use std::fs;
