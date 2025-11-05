@@ -80,7 +80,17 @@ impl Page for Projects {
                 .height(1)
         });
 
-        let table = Table::new(rows, [Constraint::Fill(1), Constraint::Fill(2)])
+        // Calculate max width needed for project type column
+        let max_project_type_len = self.projects
+            .iter()
+            .map(|p| p.project_type.len())
+            .max()
+            .unwrap_or(0) as u16;
+        
+        let table = Table::new(rows, [
+            Constraint::Fill(1), 
+            Constraint::Length(max_project_type_len)
+        ])
             .header(header)
             .block(Block::new().padding(Padding {
                 left: 1,
