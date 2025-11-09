@@ -282,17 +282,22 @@ impl App {
     }
 
     fn build_nav_widget(&self) -> List<'_> {
-        // Start with the static "page" navigation item
         let mut nav_lines: Vec<ListItem> = vec![ListItem::new(Line::from(vec![
             Span::styled("↑/↓ ", Style::default().fg(WHITE)),
             Span::styled("page", Style::default().fg(GRAY)),
         ]))];
 
-        // Add page-specific nav items if they exist
         if let Some(current_page) = self.pages.get(self.selected_page) {
             let page_nav_items = current_page.nav_items();
             nav_lines.extend(page_nav_items.into_iter().map(ListItem::new));
         }
+
+        let quit_nav_item = ListItem::new(Line::from(vec![
+            Span::styled(" q  ", Style::default().fg(WHITE)),
+            Span::styled("quit", Style::default().fg(GRAY)),
+        ]));
+
+        nav_lines.push(quit_nav_item);
 
         let final_list = List::new(nav_lines).block(Block::new().padding(Padding {
             left: 4,
