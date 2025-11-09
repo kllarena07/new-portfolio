@@ -10,10 +10,12 @@ use ratatui::{
 use std::{io, sync::mpsc, thread, time::Duration};
 
 mod pages;
-use pages::{about::About, experience::Experience, page::Page};
-
-use crate::pages::{
+use pages::{
+    about::About,
+    contact::Contact,
+    experience::Experience,
     leadership::Leadership,
+    page::Page,
     projects::Projects,
     style::{GRAY, WHITE},
 };
@@ -21,6 +23,7 @@ use crate::pages::{
 fn main() -> io::Result<()> {
     let pages: Vec<Box<dyn Page>> = vec![
         Box::new(About::new()),
+        Box::new(Contact::new()),
         Box::new(Experience::new()),
         Box::new(Projects::new()),
         Box::new(Leadership::new()),
