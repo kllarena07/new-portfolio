@@ -33,6 +33,16 @@ use crate::pages::{
     page::Page,
     style::{GRAY, WHITE, gray_span, gray_style, line_from_spans, selected_style, white_span},
 };
+
+fn osc52(text: &str) {
+    use base64::{Engine as _, engine::general_purpose};
+    
+    let encoded = general_purpose::STANDARD.encode(text.as_bytes());
+    print!("\x1b]52;c;{}\x07", encoded);
+    // Flush to ensure the sequence is sent immediately
+    use std::io::{self, Write};
+    io::stdout().flush().unwrap();
+}
 struct ProjectItem {
     name: &'static str,
     link: &'static str,
@@ -145,7 +155,7 @@ impl Page for Projects {
                 self.next_project();
             }
             KeyCode::Enter => {
-                open::that(&self.current_link).unwrap();
+                osc52(&self.current_link);
             }
             _ => {}
         }
@@ -159,7 +169,7 @@ impl Page for Projects {
             ]),
             Line::from(vec![
                 Span::styled(" ↵  ", Style::default().fg(WHITE)),
-                Span::styled("open", Style::default().fg(GRAY)),
+                Span::styled("copy", Style::default().fg(GRAY)),
             ]),
         ]
     }
