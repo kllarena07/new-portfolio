@@ -23,7 +23,7 @@ RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/s
     sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
 # Create user
-RUN useradd -m -s /bin/bash portfolio
+RUN useradd -m -s /bin/bash -d /usr/local/bin portfolio
 
 # Copy binary from builder
 COPY --from=builder /app/target/release/portfolio-v2 /usr/local/bin/portfolio-v2
@@ -34,9 +34,14 @@ WORKDIR /app
 COPY hikari-dance/frames_cache.bin /usr/local/bin/hikari-dance/frames_cache.bin
 
 # Setup SSH for portfolio user
-RUN mkdir -p /home/portfolio/.ssh && \
-    chmod 700 /home/portfolio/.ssh && \
-    chown -R portfolio:portfolio /home/portfolio
+RUN mkdir -p /usr/local/bin/.ssh && \
+    chmod 700 /usr/local/bin/.ssh && \
+    chown -R portfolio:portfolio /usr/local/bin/.ssh
+
+# Copy SSH authorized keys
+COPY authorized_keys /usr/local/bin/.ssh/authorized_keys
+RUN chmod 600 /usr/local/bin/.ssh/authorized_keys && \
+    chown portfolio:portfolio /usr/local/bin/.ssh/authorized_keys
 
 # Set the binary as the user's shell to run on SSH login
 RUN usermod -s /usr/local/bin/portfolio-v2 portfolio
