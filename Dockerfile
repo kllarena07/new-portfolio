@@ -28,6 +28,11 @@ RUN useradd -m -s /bin/bash portfolio
 # Copy binary from builder
 COPY --from=builder /app/target/release/portfolio-v2 /usr/local/bin/portfolio-v2
 
+WORKDIR /app
+
+# Copy frames_cache.bin file
+COPY hikari-dance/frames_cache.bin /usr/local/bin/hikari-dance/frames_cache.bin
+
 # Setup SSH for portfolio user
 RUN mkdir -p /home/portfolio/.ssh && \
     chmod 700 /home/portfolio/.ssh && \
