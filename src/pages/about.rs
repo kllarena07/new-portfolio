@@ -15,13 +15,20 @@ use std::fs;
 use std::io::{Read, Write};
 use std::path::Path;
 
-pub struct About {
+#[derive(Clone)]
+pub struct ContactLink<'a> {
+    pub display_text: &'a str,
+    pub link: &'a str,
+}
+
+pub struct About<'a> {
+    links: Vec<ContactLink<'a>>,
     all_frames: Vec<Vec<Vec<[u8; 3]>>>,
     max_frames: usize,
     tick: u64,
 }
 
-impl Page for About {
+impl<'a> Page for About<'a> {
     fn title(&self) -> &str {
         "about"
     }
@@ -66,7 +73,18 @@ impl Page for About {
             white_span("embedded rust on microcontrollers"),
         ]);
 
-        let paragraph = Paragraph::new(vec![
+        let mut links: Vec<Line<'_>> = (0..(self.links.len()))
+            .map(|index| {
+                let current_contact_link = &self.links[index];
+                Line::from(vec![
+                    gray_span(current_contact_link.display_text),
+                    gray_span(" - "),
+                    gray_span(current_contact_link.link),
+                ])
+            })
+            .collect();
+
+        let mut lines: Vec<Line<'_>> = vec![
             line_1,
             Line::from(""),
             line_2,
@@ -78,14 +96,20 @@ impl Page for About {
             line_5,
             Line::from(""),
             line_6,
-        ])
-        .block(Block::new().padding(Padding {
-            left: 1,
-            right: 2,
-            top: 0,
-            bottom: 0,
-        }))
-        .wrap(Wrap { trim: true });
+            Line::from(""),
+            Line::from(white_span("contact:")),
+        ];
+
+        lines.append(&mut links);
+
+        let paragraph = Paragraph::new(lines)
+            .block(Block::new().padding(Padding {
+                left: 1,
+                right: 2,
+                top: 0,
+                bottom: 0,
+            }))
+            .wrap(Wrap { trim: true });
 
         frame.render_widget(paragraph, area);
     }
@@ -132,12 +156,32 @@ impl Page for About {
     }
 }
 
-impl About {
+impl<'a> About<'a> {
     pub fn new() -> Self {
+        let links: Vec<ContactLink> = vec![
+            ContactLink {
+                display_text: "twitter",
+                link: "x.com/krayondev",
+            },
+            ContactLink {
+                display_text: "linkedin",
+                link: "linkedin.com/in/kllarena07",
+            },
+            ContactLink {
+                display_text: "github",
+                link: "github.com/kllarena07",
+            },
+            ContactLink {
+                display_text: "email",
+                link: "kieran.llarena@gmail.com",
+            },
+        ];
+
         let all_frames = get_all_frames_rgb_vals();
         let max_frames = all_frames.len();
 
         Self {
+            links,
             all_frames,
             max_frames,
             tick: 0,

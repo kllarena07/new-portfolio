@@ -12,7 +12,6 @@ use std::{io, sync::mpsc, thread, time::Duration};
 mod pages;
 use pages::{
     about::About,
-    contact::Contact,
     experience::Experience,
     leadership::Leadership,
     page::Page,
@@ -23,7 +22,6 @@ use pages::{
 fn main() -> io::Result<()> {
     let pages: Vec<Box<dyn Page>> = vec![
         Box::new(About::new()),
-        Box::new(Contact::new()),
         Box::new(Experience::new()),
         Box::new(Projects::new()),
         Box::new(Leadership::new()),
