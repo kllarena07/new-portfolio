@@ -2,7 +2,7 @@ use crossterm::event::KeyCode;
 use ratatui::{
     Frame,
     layout::{Constraint, Layout, Rect},
-    style::{Color, Style},
+    style::Style,
     text::Line,
     widgets::{Block, Borders, Cell, Padding, Paragraph, Row, Table, Wrap},
 };
@@ -21,7 +21,7 @@ use crate::pages::{
         typescript::TypeScript,
         vexo_analytics::VexoAnalytics,
     },
-    style::{gray_span, gray_style, line_from_spans, selected_style, white_span},
+    style::{WHITE, gray_span, gray_style, line_from_spans, selected_style, white_span},
 };
 use crate::pages::{
     labels::{container::LabelContainer, expo::Expo, react::react_native::ReactNative},
@@ -251,7 +251,7 @@ impl Page for Experience {
             let tech_block = Block::new()
                 .title("tech")
                 .borders(Borders::ALL)
-                .border_style(Style::default().fg(Color::Rgb(255, 255, 255)))
+                .border_style(Style::default().fg(WHITE))
                 .padding(Padding {
                     left: 1,
                     right: 1,
@@ -281,13 +281,6 @@ impl Page for Experience {
     }
 
     fn nav_items(&self) -> Vec<Line<'static>> {
-        use crate::pages::style::{GRAY, WHITE};
-        use ratatui::style::Style;
-        use ratatui::text::{Line, Span};
-
-        vec![Line::from(vec![
-            Span::styled("j/k ", Style::default().fg(WHITE)),
-            Span::styled("row", Style::default().fg(GRAY)),
-        ])]
+        vec![line_from_spans(vec![white_span("j/k "), gray_span("row")])]
     }
 }

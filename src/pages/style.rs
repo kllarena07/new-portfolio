@@ -28,6 +28,10 @@ pub fn white_span(text: &str) -> Span<'_> {
     Span::styled(text, white_style())
 }
 
+pub fn white_span_owned(text: String) -> Span<'static> {
+    Span::styled(text, white_style())
+}
+
 // Line builder from spans
 pub fn line_from_spans(spans: Vec<Span<'_>>) -> Line<'_> {
     Line::from(spans)

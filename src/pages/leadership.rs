@@ -154,13 +154,6 @@ impl Page for Leadership {
     }
 
     fn nav_items(&self) -> Vec<Line<'static>> {
-        use crate::pages::style::{GRAY, WHITE};
-        use ratatui::style::Style;
-        use ratatui::text::{Line, Span};
-
-        vec![Line::from(vec![
-            Span::styled("j/k ", Style::default().fg(WHITE)),
-            Span::styled("row", Style::default().fg(GRAY)),
-        ])]
+        vec![line_from_spans(vec![white_span("j/k "), gray_span("row")])]
     }
 }

@@ -2,8 +2,7 @@ use crossterm::event::KeyCode;
 use ratatui::{
     Frame,
     layout::{Constraint, Layout, Rect},
-    style::Style,
-    text::{Line, Span},
+    text::Line,
     widgets::{Block, Cell, Padding, Paragraph, Row, Table, Wrap},
 };
 
@@ -31,12 +30,12 @@ use crate::pages::{
         websocket::WebSocket,
     },
     page::Page,
-    style::{GRAY, WHITE, gray_span, gray_style, line_from_spans, selected_style, white_span},
+    style::{gray_span, gray_style, line_from_spans, selected_style, white_span},
 };
 
 fn osc52(text: &str) {
     use base64::{Engine as _, engine::general_purpose};
-    
+
     let encoded = general_purpose::STANDARD.encode(text.as_bytes());
     print!("\x1b]52;c;{}\x07", encoded);
     // Flush to ensure the sequence is sent immediately
@@ -163,14 +162,8 @@ impl Page for Projects {
 
     fn nav_items(&self) -> Vec<Line<'static>> {
         vec![
-            Line::from(vec![
-                Span::styled("j/k ", Style::default().fg(WHITE)),
-                Span::styled("row", Style::default().fg(GRAY)),
-            ]),
-            Line::from(vec![
-                Span::styled(" ↵  ", Style::default().fg(WHITE)),
-                Span::styled("copy", Style::default().fg(GRAY)),
-            ]),
+            line_from_spans(vec![white_span("j/k "), gray_span("row")]),
+            line_from_spans(vec![white_span(" ↵  "), gray_span("copy")]),
         ]
     }
 }
