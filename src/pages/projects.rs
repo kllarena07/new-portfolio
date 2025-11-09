@@ -1,10 +1,10 @@
 use crossterm::event::KeyCode;
 use ratatui::{
+    Frame,
     layout::{Constraint, Layout, Rect},
     style::Style,
     text::{Line, Span},
     widgets::{Block, Cell, Padding, Paragraph, Row, Table, Wrap},
-    Frame,
 };
 
 use crate::pages::{
@@ -31,7 +31,7 @@ use crate::pages::{
         websocket::WebSocket,
     },
     page::Page,
-    style::{gray_span, gray_style, line_from_spans, selected_style, white_span, GRAY, WHITE},
+    style::{GRAY, WHITE, gray_span, gray_style, line_from_spans, selected_style, white_span},
 };
 struct ProjectItem {
     name: &'static str,
