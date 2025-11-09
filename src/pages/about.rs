@@ -1,38 +1,27 @@
 use crate::pages::page::Page;
-use crate::pages::style::{
-    accent_underlined_style, gray_span, gray_style, line_from_spans, white_span,
-};
+use crate::pages::style::{gray_span, line_from_spans, white_span};
 use bincode::{Decode, Encode};
 use crossterm::event::KeyCode;
 use image::ImageReader;
 use ratatui::{
+    Frame,
     layout::Rect,
-    text::{Line, Span},
+    text::Line,
     widgets::canvas::{Canvas, Points},
     widgets::{Block, Padding, Paragraph, Wrap},
-    Frame,
 };
 use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
 use std::fs;
 use std::io::{Read, Write};
 use std::path::Path;
 
-#[derive(Clone)]
-pub struct ContactLink<'a> {
-    pub display_text: &'a str,
-    pub link: &'a str,
-}
-
-pub struct About<'a> {
-    state: usize,
-    current_link: String,
-    links: Vec<ContactLink<'a>>,
+pub struct About {
     all_frames: Vec<Vec<Vec<[u8; 3]>>>,
     max_frames: usize,
     tick: u64,
 }
 
-impl<'a> Page for About<'a> {
+impl Page for About {
     fn title(&self) -> &str {
         "about"
     }
@@ -77,25 +66,6 @@ impl<'a> Page for About<'a> {
             white_span("embedded rust on microcontrollers"),
         ]);
 
-        let line_items: Vec<Span> = (0..(self.links.len() * 2) - 1)
-            .map(move |index| {
-                if (index + 1) % 2 == 0 {
-                    return gray_span(" - ");
-                }
-
-                let style_config = match index / 2 == self.state {
-                    true => accent_underlined_style(),
-                    false => gray_style(),
-                };
-
-                let display_text = self.links[index / 2].display_text.to_owned();
-
-                Span::styled(display_text, style_config)
-            })
-            .collect();
-
-        let links_line = line_from_spans(line_items);
-
         let paragraph = Paragraph::new(vec![
             line_1,
             Line::from(""),
@@ -108,8 +78,6 @@ impl<'a> Page for About<'a> {
             line_5,
             Line::from(""),
             line_6,
-            Line::from(""),
-            links_line,
         ])
         .block(Block::new().padding(Padding {
             left: 1,
@@ -156,94 +124,24 @@ impl<'a> Page for About<'a> {
         frame.render_widget(canvas, area);
     }
 
-    fn keyboard_event_handler(&mut self, key_code: KeyCode) {
-        match key_code {
-            KeyCode::Left => {
-                self.previous_link();
-            }
-            KeyCode::Right => {
-                self.next_link();
-            }
-            KeyCode::Enter => {
-                open::that(&self.current_link).unwrap();
-            }
-            _ => {}
-        }
-    }
+    fn keyboard_event_handler(&mut self, _key_code: KeyCode) {}
 
     fn on_tick(&mut self, tick: u64) -> bool {
         self.tick = tick;
         true
     }
-
-    fn nav_items(&self) -> Vec<Line<'static>> {
-        use crate::pages::style::{GRAY, WHITE};
-        use ratatui::style::Style;
-        use ratatui::text::{Line, Span};
-
-        vec![
-            Line::from(vec![
-                Span::styled("←/→ ", Style::default().fg(WHITE)),
-                Span::styled("link", Style::default().fg(GRAY)),
-            ]),
-            Line::from(vec![
-                Span::styled(" ↵  ", Style::default().fg(WHITE)),
-                Span::styled("open", Style::default().fg(GRAY)),
-            ]),
-        ]
-    }
 }
 
-impl<'a> About<'a> {
+impl About {
     pub fn new() -> Self {
-        let links: Vec<ContactLink> = vec![
-            ContactLink {
-                display_text: "twitter",
-                link: "https://x.com/krayondev",
-            },
-            ContactLink {
-                display_text: "linkedin",
-                link: "https://www.linkedin.com/in/kllarena07/",
-            },
-            ContactLink {
-                display_text: "github",
-                link: "https://github.com/kllarena07",
-            },
-            ContactLink {
-                display_text: "email",
-                link: "mailto:kieran.llarena@gmail.com",
-            },
-        ];
-
         let all_frames = get_all_frames_rgb_vals();
         let max_frames = all_frames.len();
 
         Self {
-            state: 0,
-            current_link: String::from(links[0].link),
-            links,
             all_frames,
             max_frames,
             tick: 0,
         }
-    }
-
-    fn previous_link(&mut self) {
-        if self.state > 0 {
-            self.state -= 1;
-            self.change_current_link();
-        }
-    }
-
-    fn next_link(&mut self) {
-        if self.state + 1 < self.links.len() {
-            self.state += 1;
-            self.change_current_link();
-        }
-    }
-
-    fn change_current_link(&mut self) {
-        self.current_link = String::from(self.links[self.state].link);
     }
 }
 
