@@ -4,7 +4,7 @@ use ratatui::{
     layout::{Constraint, Flex, Layout},
     style::{Color, Style, Stylize},
     symbols,
-    text::{Line, Span},
+    text::Line,
     widgets::{Block, Borders, List, ListItem, Padding},
 };
 use std::{env, io, sync::mpsc, thread, time::Duration};
@@ -16,7 +16,7 @@ use pages::{
     leadership::Leadership,
     page::Page,
     projects::Projects,
-    style::{GRAY, WHITE},
+    style::{GRAY, gray_span, white_span, white_span_owned},
 };
 
 fn main() -> io::Result<()> {
@@ -249,16 +249,11 @@ impl App {
         let menu_items: Vec<ListItem> = (0..self.pages.len())
             .map(move |index| {
                 let title = self.pages[index].title();
-                let item_content = if index == self.selected_page {
-                    format!("[ {} ]", title)
-                } else {
-                    title.to_string()
-                };
 
                 let span = if index == self.selected_page {
-                    Span::styled(item_content, Style::default().fg(Color::Rgb(255, 255, 255)))
+                    white_span_owned(format!("[ {} ]", title))
                 } else {
-                    Span::styled(item_content, Style::default().fg(Color::Rgb(147, 147, 147)))
+                    gray_span(&title)
                 };
 
                 ListItem::new(span.bold().into_right_aligned_line())
@@ -269,7 +264,7 @@ impl App {
             Block::new()
                 .borders(Borders::RIGHT)
                 .border_set(symbols::border::ONE_EIGHTH_TALL)
-                .border_style(Style::new().fg(Color::Rgb(147, 147, 147)))
+                .border_style(Style::new().fg(GRAY))
                 .padding(Padding {
                     top: 1,
                     bottom: 1,
@@ -283,8 +278,8 @@ impl App {
 
     fn build_nav_widget(&self) -> List<'_> {
         let mut nav_lines: Vec<ListItem> = vec![ListItem::new(Line::from(vec![
-            Span::styled("↑/↓ ", Style::default().fg(WHITE)),
-            Span::styled("page", Style::default().fg(GRAY)),
+            white_span("↑/↓ "),
+            gray_span("page"),
         ]))];
 
         if let Some(current_page) = self.pages.get(self.selected_page) {
@@ -292,10 +287,7 @@ impl App {
             nav_lines.extend(page_nav_items.into_iter().map(ListItem::new));
         }
 
-        let quit_nav_item = ListItem::new(Line::from(vec![
-            Span::styled(" q  ", Style::default().fg(WHITE)),
-            Span::styled("quit", Style::default().fg(GRAY)),
-        ]));
+        let quit_nav_item = ListItem::new(Line::from(vec![white_span(" q  "), gray_span("quit")]));
 
         nav_lines.push(quit_nav_item);
 
