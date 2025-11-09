@@ -7,7 +7,7 @@ use ratatui::{
     text::{Line, Span},
     widgets::{Block, Borders, List, ListItem, Padding},
 };
-use std::{io, sync::mpsc, thread, time::Duration};
+use std::{env, io, sync::mpsc, thread, time::Duration};
 
 mod pages;
 use pages::{
@@ -20,6 +20,14 @@ use pages::{
 };
 
 fn main() -> io::Result<()> {
+    let show_widgets = env::var("SHOW_WIDGETS").unwrap_or_default();
+    let show_left = show_widgets == "LEFT" || show_widgets == "ALL";
+    let show_center = show_widgets == "CENTER" || show_widgets == "ALL";
+    let show_right = show_widgets == "RIGHT" || show_widgets == "ALL";
+    let show_menu = show_widgets == "MENU" || show_widgets == "ALL";
+    let show_aa1 = show_widgets == "AA1" || show_widgets == "ALL";
+    let show_additional = show_widgets == "ADDITIONAL" || show_widgets == "ALL";
+
     let pages: Vec<Box<dyn Page>> = vec![
         Box::new(About::new()),
         Box::new(Experience::new()),
@@ -31,6 +39,12 @@ fn main() -> io::Result<()> {
         running: true,
         selected_page: 0,
         pages,
+        show_left,
+        show_center,
+        show_right,
+        show_menu,
+        show_aa1,
+        show_additional,
     };
 
     let mut terminal = ratatui::init();
@@ -81,6 +95,12 @@ struct App {
     running: bool,
     selected_page: usize,
     pages: Vec<Box<dyn Page>>,
+    show_left: bool,
+    show_center: bool,
+    show_right: bool,
+    show_menu: bool,
+    show_aa1: bool,
+    show_additional: bool,
 }
 
 impl App {
@@ -134,41 +154,51 @@ impl App {
         let [canvas_area] = Layout::horizontal([Constraint::Max(50)]).areas(vcanvas_area);
         let [additional_area] = Layout::horizontal([Constraint::Max(50)]).areas(right_area);
 
-        // frame.render_widget(
-        //     Block::new()
-        //         .fg(Color::Red)
-        //         .title("Left")
-        //         .borders(Borders::ALL),
-        //     left_area,
-        // );
-        // frame.render_widget(
-        //     Block::new()
-        //         .fg(Color::Green)
-        //         .title("Menu")
-        //         .borders(Borders::ALL),
-        //     menu_area,
-        // );
-        // frame.render_widget(
-        //     Block::new()
-        //         .fg(Color::Green)
-        //         .title("Center")
-        //         .borders(Borders::ALL),
-        //     center_area,
-        // );
-        // frame.render_widget(
-        //     Block::new()
-        //         .fg(Color::Blue)
-        //         .title("Right")
-        //         .borders(Borders::ALL),
-        //     aa1,
-        // );
-        // frame.render_widget(
-        //     Block::new()
-        //         .fg(Color::Blue)
-        //         .title("Right")
-        //         .borders(Borders::ALL),
-        //     additional_area,
-        // );
+        if self.show_left {
+            frame.render_widget(
+                Block::new()
+                    .fg(Color::Red)
+                    .title("Left")
+                    .borders(Borders::ALL),
+                left_area,
+            );
+        }
+        if self.show_menu {
+            frame.render_widget(
+                Block::new()
+                    .fg(Color::Green)
+                    .title("Menu")
+                    .borders(Borders::ALL),
+                menu_area,
+            );
+        }
+        if self.show_center {
+            frame.render_widget(
+                Block::new()
+                    .fg(Color::Green)
+                    .title("Center")
+                    .borders(Borders::ALL),
+                center_area,
+            );
+        }
+        if self.show_right || self.show_aa1 {
+            frame.render_widget(
+                Block::new()
+                    .fg(Color::Blue)
+                    .title("Right")
+                    .borders(Borders::ALL),
+                canvas_area,
+            );
+        }
+        if self.show_right || self.show_additional {
+            frame.render_widget(
+                Block::new()
+                    .fg(Color::Blue)
+                    .title("Right")
+                    .borders(Borders::ALL),
+                additional_area,
+            );
+        }
 
         let menu_widget = self.build_menu_widget();
         frame.render_widget(menu_widget, menu_area);
