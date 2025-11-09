@@ -20,10 +20,10 @@ RUN mkdir /var/run/sshd
 # Configure SSH for passwordless access with public key auth
 RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
     sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config && \
-    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
 
-# Create user
-RUN useradd -m -s /bin/bash -d /usr/local/bin portfolio
+# Create user with restricted shell
+RUN useradd -m -s /usr/sbin/nologin -d /usr/local/bin portfolio
 
 # Copy binary from builder
 COPY --from=builder /app/target/release/portfolio-v2 /usr/local/bin/portfolio-v2
