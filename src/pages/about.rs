@@ -195,7 +195,6 @@ struct FrameCache {
 }
 
 fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
-    const LIMIT_TO_10_FRAMES: bool = false; // Set to true to only load first 10 frames
     const CACHE_FILE: &str = "./hikari-dance/frames_cache.bin";
 
     // Try to load from cache first
@@ -251,14 +250,7 @@ fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
         println!("{}: {}", i, path.file_name().unwrap().to_string_lossy());
     }
 
-    // Process each frame in parallel using rayon
-    let frames_to_process = if LIMIT_TO_10_FRAMES {
-        frame_files.into_iter().take(10).collect()
-    } else {
-        frame_files
-    };
-
-    let all_frames: Vec<Vec<Vec<[u8; 3]>>> = frames_to_process
+    let all_frames: Vec<Vec<Vec<[u8; 3]>>> = frame_files
         .par_iter()
         .filter_map(|frame_path| {
             ImageReader::open(frame_path)
