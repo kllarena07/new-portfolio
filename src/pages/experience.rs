@@ -1,10 +1,12 @@
 use crossterm::event::KeyCode;
 use ratatui::{
-    layout::{Constraint, Layout, Rect},
-    text::Line,
-    widgets::{Block, Cell, Padding, Paragraph, Row, Table, Wrap},
     Frame,
+    layout::{Constraint, Layout, Rect},
+    style::{Color, Style},
+    text::Line,
+    widgets::{Block, Borders, Cell, Padding, Paragraph, Row, Table, Wrap},
 };
+use std::env;
 
 use crate::pages::{
     labels::{
@@ -43,10 +45,14 @@ impl ExperienceItem {
 pub struct Experience {
     state: usize,
     experiences: Vec<ExperienceItem>,
+    show_tech_block: bool,
 }
 
 impl Experience {
     pub fn new() -> Self {
+        let show_widgets = env::var("SHOW_WIDGETS").unwrap_or_default();
+        let show_tech_block = show_widgets == "TECH" || show_widgets == "ALL";
+
         let experiences = vec![
             ExperienceItem {
                 role: "swe intern",
@@ -143,6 +149,7 @@ impl Experience {
         Self {
             state: 0,
             experiences,
+            show_tech_block,
         }
     }
 
@@ -240,18 +247,20 @@ impl Page for Experience {
         // Render the description paragraph
         frame.render_widget(paragraph, text_area);
 
-        // let tech_block = Block::new()
-        //     .title("tech")
-        //     .borders(Borders::ALL)
-        //     .border_style(Style::default().fg(Color::Rgb(255, 255, 255)))
-        //     .padding(Padding {
-        //         left: 1,
-        //         right: 1,
-        //         top: 0,
-        //         bottom: 0,
-        //     });
+        if self.show_tech_block {
+            let tech_block = Block::new()
+                .title("tech")
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(Color::Rgb(255, 255, 255)))
+                .padding(Padding {
+                    left: 1,
+                    right: 1,
+                    top: 0,
+                    bottom: 0,
+                });
 
-        // frame.render_widget(tech_block, tech_area);
+            frame.render_widget(tech_block, tech_area);
+        }
 
         // Create and render label container with technologies from current experience
         let experience_item = &self.experiences[self.state];
