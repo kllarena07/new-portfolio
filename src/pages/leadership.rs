@@ -1,10 +1,10 @@
 use crossterm::event::KeyCode;
 use ratatui::{
+    Frame,
     layout::Constraint,
     layout::Rect,
     text::Line,
     widgets::{Block, Cell, Padding, Paragraph, Row, Table, Wrap},
-    Frame,
 };
 
 use crate::pages::page::Page;
