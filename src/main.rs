@@ -1,11 +1,11 @@
 use crossterm::event::KeyCode;
 use ratatui::{
     DefaultTerminal, Frame,
-    layout::{Constraint, Flex, Layout},
+    layout::{Alignment, Constraint, Flex, Layout},
     style::{Color, Style, Stylize},
     symbols,
     text::Line,
-    widgets::{Block, Borders, List, ListItem, Padding},
+    widgets::{Block, Borders, List, ListItem, Padding, Paragraph},
 };
 use std::{env, io, sync::mpsc, thread, time::Duration};
 
@@ -122,6 +122,24 @@ impl App {
     }
 
     fn draw(&mut self, frame: &mut Frame) {
+        let terminal_width = frame.area().width;
+        if terminal_width < 150 {
+            let centered_area = Layout::vertical([
+                Constraint::Percentage(50),
+                Constraint::Length(2),
+                Constraint::Percentage(50),
+            ])
+            .flex(Flex::Center)
+            .split(frame.area())[1];
+            frame.render_widget(
+                Paragraph::new("Terminal too narrow\nMinimum width: 150 columns")
+                    .style(Style::new().fg(Color::Red))
+                    .alignment(Alignment::Center),
+                centered_area,
+            );
+            return;
+        }
+
         let [vertical_area] = Layout::vertical([Constraint::Percentage(50)])
             .flex(Flex::Center)
             .areas(frame.area());
