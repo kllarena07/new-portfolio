@@ -61,6 +61,9 @@ pub struct Projects {
     state: usize,
     current_link: String,
     projects: Vec<ProjectItem>,
+    show_tooltip: bool,
+    tooltip_end_tick: u64,
+    current_tick: u64,
 }
 
 impl Page for Projects {
@@ -69,6 +72,19 @@ impl Page for Projects {
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) {
+        // Split area into tooltip area and content area
+        let [tooltip_area, content_area] =
+            Layout::vertical([Constraint::Length(1), Constraint::Min(0)]).areas(area);
+
+        // Render tooltip if active
+        if self.show_tooltip {
+            let tooltip_text = "✔ project link copied to clipboard";
+            let tooltip_paragraph = Paragraph::new(tooltip_text)
+                .style(ratatui::style::Style::new().fg(ratatui::style::Color::Green))
+                .alignment(ratatui::layout::Alignment::Center);
+            frame.render_widget(tooltip_paragraph, tooltip_area);
+        }
+
         let header = ["name", "project type"]
             .into_iter()
             .map(Cell::from)
@@ -113,7 +129,7 @@ impl Page for Projects {
             bottom: 0,
         }));
 
-        frame.render_widget(table, area);
+        frame.render_widget(table, content_area);
     }
 
     fn render_additional(&self, frame: &mut Frame, area: Rect) {
@@ -155,6 +171,8 @@ impl Page for Projects {
             }
             KeyCode::Enter => {
                 osc52(&self.current_link);
+                self.show_tooltip = true;
+                self.tooltip_end_tick = self.current_tick + 38;
             }
             _ => {}
         }
@@ -165,6 +183,14 @@ impl Page for Projects {
             line_from_spans(vec![white_span("j/k "), gray_span("row")]),
             line_from_spans(vec![white_span(" ↵  "), gray_span("copy")]),
         ]
+    }
+
+    fn on_tick(&mut self, tick: u64) -> bool {
+        self.current_tick = tick;
+        if self.show_tooltip && tick >= self.tooltip_end_tick {
+            self.show_tooltip = false;
+        }
+        true
     }
 }
 
@@ -315,6 +341,9 @@ impl Projects {
             state: 0,
             current_link: String::from(projects[0].link),
             projects,
+            show_tooltip: false,
+            tooltip_end_tick: 0,
+            current_tick: 0,
         }
     }
 
