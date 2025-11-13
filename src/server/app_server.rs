@@ -154,7 +154,7 @@ impl Handler for AppServer {
             let mut clients = self.clients.lock().await;
             if let Some((_, app)) = clients.get_mut(&self.id) {
                 let handle_result = app.handle_key_event(key_code);
-                if handle_result.is_err() || !app.running {
+                if handle_result.is_err() {
                     clients.remove(&self.id);
                     session.close(channel)?;
                 }
