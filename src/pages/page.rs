@@ -1,7 +1,7 @@
 use crossterm::event::KeyCode;
 use ratatui::{Frame, layout::Rect, text::Line};
 
-pub trait Page {
+pub trait Page: Send + Sync {
     fn title(&self) -> &str;
     fn render(&self, frame: &mut Frame, area: Rect);
     fn render_additional(&self, frame: &mut Frame, area: Rect);
