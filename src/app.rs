@@ -172,6 +172,7 @@ impl App {
         match key_event {
             KeyCode::Char('q') => {
                 self.running = false;
+                return Err(io::Error::new(io::ErrorKind::ConnectionAborted, "Quit requested"));
             }
             KeyCode::Up => self.previous_page(),
             KeyCode::Down => self.next_page(),
