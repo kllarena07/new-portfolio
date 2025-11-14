@@ -71,3 +71,5 @@ portfolio-v2/
 ├── README.md                        # This file
 └── start.sh                         # Application startup script
 ```
+
+Made with ❤️ by [krayondev](https://x.com/krayondev)
