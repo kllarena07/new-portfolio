@@ -33,12 +33,7 @@ portfolio-v2/
 │   │   └── terminal_handle.rs       # Terminal handling logic
 │   ├── app.rs                       # Main app logic
 │   └── main.rs
-├── .gitignore
-├── Cargo.lock
-├── Cargo.toml
-├── give_perms.sh
-├── README.md
-└── start.sh
+└── other utilities
 ```
 
 _Made with ❤️ by [krayondev](https://x.com/krayondev)_
