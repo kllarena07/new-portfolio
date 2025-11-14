@@ -4,9 +4,11 @@
 
 Inspired by [terminal.shop](https://www.terminal.shop/) and the brilliant minds at Terminal Products, Inc.
 
-This is the code repository for my portfolio, specifically the terminal version of it. You can visit it at `ssh krayon.dev`.
+This is the code repository for my portfolio, specifically the terminal version of it.
 
-To view the website version, use HTTPS instead of SSH..or just see https://krayon.dev. The code is publicly available [here](https://github.com/kllarena07/portfolio-v2-website)
+You can visit it at `ssh krayon.dev` (use in a modern terminal for the best experience).
+
+To view the website version, use HTTPS instead of SSH...or see https://krayon.dev. The code is publicly available [here](https://github.com/kllarena07/portfolio-v2-website)
 
 ## Portfolio Structure
 
