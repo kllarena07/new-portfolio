@@ -41,4 +41,4 @@ portfolio-v2/
 └── start.sh
 ```
 
-Made with ❤️ by [krayondev](https://x.com/krayondev)
+_Made with ❤️ by [krayondev](https://x.com/krayondev)_
