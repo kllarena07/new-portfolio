@@ -36,4 +36,8 @@ portfolio-v2/
 └── other utilities
 ```
 
+## 👾 Bugs or vulnerabilities
+
+If you find any bugs or vulnerabilities, please contact me on my Twitter using the link below.
+
 _Made with ❤️ by [krayondev](https://x.com/krayondev)_
