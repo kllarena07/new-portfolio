@@ -1,6 +1,6 @@
 # Kieran Llarena's Portfolio
 
-## About
+## ✍ About
 
 Inspired by [terminal.shop](https://www.terminal.shop/) and the brilliant minds at Terminal Products, Inc.
 
@@ -10,7 +10,7 @@ You can visit it at `ssh krayon.dev` (use in a modern terminal for the best expe
 
 To view the website version, use HTTPS instead of SSH...or see https://krayon.dev. View the code [here](https://github.com/kllarena07/portfolio-v2-website)
 
-## General Portfolio Structure
+## 📂 General Portfolio Structure
 
 ```
 portfolio-v2/
