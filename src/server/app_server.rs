@@ -155,6 +155,10 @@ impl Handler for AppServer {
             if let Some((_, app)) = clients.get_mut(&self.id) {
                 let handle_result = app.handle_key_event(key_code);
                 if handle_result.is_err() {
+                    // Send terminal reset sequence directly through SSH session
+                    let reset_sequence = b"\x1b[0m\x1b[2J\x1b[H\x1b[r\x1b[?25h";
+                    let _ = session.data(channel, reset_sequence.as_ref().into());
+
                     clients.remove(&self.id);
                     session.close(channel)?;
                 }
@@ -214,12 +218,29 @@ impl Handler for AppServer {
         session.channel_success(channel)?;
         Ok(())
     }
+
+    async fn channel_close(
+        &mut self,
+        channel: ChannelId,
+        session: &mut Session,
+    ) -> Result<(), Self::Error> {
+        let mut clients = self.clients.lock().await;
+
+        // Send terminal reset sequence directly through SSH session
+        let reset_sequence = b"\x1b[0m\x1b[2J\x1b[H\x1b[r\x1b[?25h";
+        let _ = session.data(channel, reset_sequence.as_ref().into());
+
+        clients.remove(&self.id);
+        session.close(channel)?;
+        Ok(())
+    }
 }
 
 impl Drop for AppServer {
     fn drop(&mut self) {
         let id = self.id;
         let clients = self.clients.clone();
+        // Note: Can't send reset sequence here since we don't have session access
         tokio::spawn(async move {
             let mut clients = clients.lock().await;
             clients.remove(&id);
