@@ -10,70 +10,35 @@ You can visit it at `ssh krayon.dev` (use in a modern terminal for the best expe
 
 To view the website version, use HTTPS instead of SSH...or see https://krayon.dev. View the code [here](https://github.com/kllarena07/portfolio-v2-website)
 
-## Portfolio Structure
+## General Portfolio Structure
 
 ```
 portfolio-v2/
-├── hikari-dance/                    # Animation frames for the terminal interface
-│   ├── frame_0.png through frame_67.png
-│   └── frames_cache.bin
+├── hikari-dance/                    # Animation frames
+│   ├── frame_0.png -> frame_67.png
+│   └── frames_cache.bin             # Cached binary frame data
 ├── src/
-│   ├── pages/                       # Terminal page components
-│   │   ├── labels/                  # Technology/service labels
-│   │   │   ├── aws/                 # AWS service labels
-│   │   │   │   ├── eventbridge_scheduler.rs
-│   │   │   │   ├── lambda.rs
-│   │   │   │   ├── s3.rs
-│   │   │   │   ├── sagemaker.rs
-│   │   │   │   └── mod.rs
-│   │   │   ├── cloudflare/          # Cloudflare service labels
-│   │   │   │   ├── images.rs
-│   │   │   │   ├── workers.rs
-│   │   │   │   └── mod.rs
-│   │   │   ├── react/               # React ecosystem labels
-│   │   │   │   ├── react.rs
-│   │   │   │   ├── react_native.rs
-│   │   │   │   └── mod.rs
-│   │   │   ├── container.rs         # Container technology labels
-│   │   │   ├── expo.rs              # Expo framework labels
-│   │   │   ├── fastapi.rs           # FastAPI labels
-│   │   │   ├── flask.rs             # Flask labels
-│   │   │   ├── groq.rs              # Groq AI labels
-│   │   │   ├── javascript.rs        # JavaScript labels
-│   │   │   ├── kinde_auth.rs        # Kinde auth labels
-│   │   │   ├── label.rs             # Base label component
-│   │   │   ├── modal.rs             # Modal component
-│   │   │   ├── nextjs.rs            # Next.js labels
-│   │   │   ├── pinecone.rs          # Pinecone labels
-│   │   │   ├── pocketbase.rs        # PocketBase labels
-│   │   │   ├── python.rs            # Python labels
-│   │   │   ├── retell_ai.rs         # Retell AI labels
-│   │   │   ├── supabase.rs          # Supabase labels
-│   │   │   ├── sveltekit.rs         # SvelteKit labels
-│   │   │   ├── tailwind.rs          # Tailwind CSS labels
-│   │   │   ├── typescript.rs        # TypeScript labels
-│   │   │   ├── vexo_analytics.rs    # Vexo Analytics labels
-│   │   │   ├── websocket.rs         # WebSocket labels
-│   │   │   └── mod.rs
-│   │   ├── about.rs                 # About page
-│   │   ├── experience.rs            # Experience page
-│   │   ├── leadership.rs            # Leadership page
-│   │   ├── mod.rs                   # Pages module
+│   ├── pages/                       # Portfolio pages
+│   │   ├── labels/                  # Tech labels
+│   │   ├── about.rs
+│   │   ├── experience.rs
+│   │   ├── leadership.rs
+│   │   ├── mod.rs
 │   │   ├── page.rs                  # Base page component
-│   │   ├── projects.rs              # Projects page
+│   │   ├── projects.rs
 │   │   └── style.rs                 # Styling utilities
 │   ├── server/                      # Server-side components
-│   │   ├── app_server.rs            # Main application server
-│   │   ├── mod.rs                   # Server module
+│   │   ├── app_server.rs            # Main SSH server logic
+│   │   ├── mod.rs                   
 │   │   └── terminal_handle.rs       # Terminal handling logic
-│   ├── app.rs                       # Main application logic
-│   └── main.rs                      # Application entry point
-├── .gitignore                       # Git ignore file
-├── Cargo.lock                       # Cargo lock file
-├── Cargo.toml                       # Rust project configuration
-├── give_perms.sh                    # Permission setup script
-├── README.md                        # This file
-└── start.sh                         # Application startup script
+│   ├── app.rs                       # Main app logic
+│   └── main.rs
+├── .gitignore
+├── Cargo.lock
+├── Cargo.toml
+├── give_perms.sh
+├── README.md
+└── start.sh
 ```
 
 Made with ❤️ by [krayondev](https://x.com/krayondev)
