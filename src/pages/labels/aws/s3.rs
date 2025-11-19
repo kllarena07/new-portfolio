@@ -7,6 +7,6 @@ const S3_BG: Color = Color::Rgb(209, 93, 75);
 
 impl S3 {
     pub fn build() -> ColoredLabel {
-        ColoredLabel::new("react", BLACK, S3_BG)
+        ColoredLabel::new("s3", BLACK, S3_BG)
     }
 }
