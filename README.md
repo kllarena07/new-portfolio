@@ -8,7 +8,7 @@ This is the code repository for my portfolio, specifically the terminal version 
 
 You can visit it at `ssh krayon.dev` (use in a modern terminal for the best experience).
 
-To view the website version, use HTTPS instead of SSH...or see https://krayon.dev. View the code [here](https://github.com/kllarena07/portfolio-v2-website)
+To view the website version, use HTTP/HTTPS instead of SSH...or see https://krayon.dev. View the code [here](https://github.com/kllarena07/portfolio-v2-website)
 
 ## 📂 General Portfolio Structure
 
