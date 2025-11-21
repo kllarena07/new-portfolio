@@ -7,6 +7,6 @@ const GROQ_BG: Color = Color::Rgb(251, 62, 49);
 
 impl Groq {
     pub fn build() -> ColoredLabel {
-        ColoredLabel::new("fastapi", WHITE, GROQ_BG)
+        ColoredLabel::new("groq", WHITE, GROQ_BG)
     }
 }

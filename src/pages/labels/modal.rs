@@ -7,6 +7,6 @@ const MODAL_BG: Color = Color::Rgb(106, 239, 91);
 
 impl Modal {
     pub fn build() -> ColoredLabel {
-        ColoredLabel::new("fastapi", WHITE, MODAL_BG)
+        ColoredLabel::new("modal", WHITE, MODAL_BG)
     }
 }
