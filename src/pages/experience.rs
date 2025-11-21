@@ -226,7 +226,7 @@ impl Page for Experience {
         .block(Block::new().padding(Padding {
             left: 1,
             right: 2,
-            top: 0,
+            top: 1,
             bottom: 0,
         }));
 
