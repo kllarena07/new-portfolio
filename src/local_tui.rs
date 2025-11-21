@@ -1,10 +1,4 @@
-use crossterm::{
-    event::{self, DisableMouseCapture, EnableMouseCapture, Event},
-    execute,
-    terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
-};
-use ratatui::{Terminal, backend::CrosstermBackend};
-use std::io;
+use crossterm::event::{self, Event};
 
 use crate::app::App;
 
@@ -16,11 +10,7 @@ impl LocalTuiRunner {
     }
 
     pub async fn run(&self) -> Result<(), anyhow::Error> {
-        enable_raw_mode()?;
-        let mut stdout = io::stdout();
-        execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
-        let backend = CrosstermBackend::new(stdout);
-        let mut terminal = Terminal::new(backend)?;
+        let mut terminal = ratatui::init();
 
         let mut app = App::new();
         let mut tick: u64 = 0;
@@ -43,13 +33,7 @@ impl LocalTuiRunner {
             tick = tick.wrapping_add(1);
         }
 
-        restore_terminal()?;
+        ratatui::restore();
         Ok(())
     }
-}
-
-fn restore_terminal() -> Result<(), io::Error> {
-    disable_raw_mode()?;
-    execute!(io::stdout(), LeaveAlternateScreen, DisableMouseCapture)?;
-    Ok(())
 }
