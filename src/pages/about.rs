@@ -1,5 +1,5 @@
 use crate::pages::page::Page;
-use crate::pages::style::{gray_span, line_from_spans, link_span, white_span, dimmed_link_style};
+use crate::pages::style::{dimmed_link_style, gray_span, line_from_spans, link_span, white_span};
 use bincode::{Decode, Encode};
 use crossterm::event::KeyCode;
 use image::ImageReader;
@@ -237,7 +237,7 @@ impl<'a> About<'a> {
         }
     }
 
-    pub fn new() -> Self {
+    pub fn new(show_debug_frames: bool) -> Self {
         let links: Vec<ContactLink> = vec![
             ContactLink {
                 display_text: "twitter",
@@ -257,7 +257,7 @@ impl<'a> About<'a> {
             },
         ];
 
-        let all_frames = get_all_frames_rgb_vals();
+        let all_frames = get_all_frames_rgb_vals(show_debug_frames);
         let max_frames = all_frames.len();
 
         let initial_link = links
@@ -283,23 +283,31 @@ struct FrameCache {
     frames: Vec<Vec<Vec<[u8; 3]>>>,
 }
 
-fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
+fn get_all_frames_rgb_vals(show_debug_frames: bool) -> Vec<Vec<Vec<[u8; 3]>>> {
     const CACHE_FILE: &str = "./hikari-dance/frames_cache.bin";
 
     // Try to load from cache first
     if Path::new(CACHE_FILE).exists() {
-        println!("Loading frames from cache...");
+        if show_debug_frames {
+            println!("Loading frames from cache...");
+        }
         if let Ok(cached_frames) = load_frames_from_cache(CACHE_FILE) {
-            println!(
-                "Successfully loaded {} frames from cache",
-                cached_frames.len()
-            );
+            if show_debug_frames {
+                println!(
+                    "Successfully loaded {} frames from cache",
+                    cached_frames.len()
+                );
+            }
             return cached_frames;
         }
-        println!("Cache load failed, recalculating frames...");
+        if show_debug_frames {
+            println!("Cache load failed, recalculating frames...");
+        }
     }
 
-    println!("Cache not found, processing frames...");
+    if show_debug_frames {
+        println!("Cache not found, processing frames...");
+    }
 
     // Read all frame files from hikari directory
     let mut frame_files = Vec::new();
@@ -334,9 +342,11 @@ fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
     });
 
     // Debug: Print first few frame names to verify ordering
-    println!("Frame loading order (first 10):");
-    for (i, path) in frame_files.iter().take(10).enumerate() {
-        println!("{}: {}", i, path.file_name().unwrap().to_string_lossy());
+    if show_debug_frames {
+        println!("Frame loading order (first 10):");
+        for (i, path) in frame_files.iter().take(10).enumerate() {
+            println!("{}: {}", i, path.file_name().unwrap().to_string_lossy());
+        }
     }
 
     let all_frames: Vec<Vec<Vec<[u8; 3]>>> = frame_files
@@ -375,7 +385,9 @@ fn get_all_frames_rgb_vals() -> Vec<Vec<Vec<[u8; 3]>>> {
     if let Err(e) = save_frames_to_cache(&all_frames, CACHE_FILE) {
         eprintln!("Warning: Failed to save frames to cache: {}", e);
     } else {
-        println!("Successfully cached {} frames", all_frames.len());
+        if show_debug_frames {
+            println!("Successfully cached {} frames", all_frames.len());
+        }
     }
 
     all_frames

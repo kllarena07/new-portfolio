@@ -42,9 +42,11 @@ impl App {
         let show_menu = show_widgets == "MENU" || show_widgets == "ALL";
         let show_aa1 = show_widgets == "AA1" || show_widgets == "ALL";
         let show_additional = show_widgets == "ADDITIONAL" || show_widgets == "ALL";
+        let debug_frames = std::env::var("FRAME_DEBUG").unwrap_or_default();
+        let show_debug_frames = debug_frames == "TRUE" || debug_frames == "true";
 
         let pages: Vec<Box<dyn Page>> = vec![
-            Box::new(crate::pages::about::About::new()),
+            Box::new(crate::pages::about::About::new(show_debug_frames)),
             Box::new(crate::pages::experience::Experience::new()),
             Box::new(crate::pages::projects::Projects::new()),
             Box::new(crate::pages::leadership::Leadership::new()),
