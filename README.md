@@ -13,7 +13,7 @@ To view the website version, use HTTP/HTTPS instead of SSH...or see https://kray
 ## 📂 General Portfolio Structure
 
 ```
-portfolio-v2/
+ssh_krayon.dev/
 ├── hikari-dance/                    # Animation frames
 │   ├── frame_0.png -> frame_67.png
 │   └── frames_cache.bin             # Cached binary frame data
