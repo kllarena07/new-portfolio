@@ -1,19 +1,28 @@
 use crate::pages::page::Page;
-use crate::pages::style::{gray_span, line_from_spans, white_span};
+use crate::pages::style::{gray_span, line_from_spans, link_span, white_span, dimmed_link_style};
 use bincode::{Decode, Encode};
 use crossterm::event::KeyCode;
 use image::ImageReader;
 use ratatui::{
     Frame,
-    layout::Rect,
-    text::Line,
+    layout::{Constraint, Layout, Rect},
+    text::{Line, Span},
     widgets::canvas::{Canvas, Points},
     widgets::{Block, Padding, Paragraph, Wrap},
 };
 use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
 use std::fs;
-use std::io::{Read, Write};
+use std::io::{self, Read, Write};
 use std::path::Path;
+
+fn osc52(text: &str) {
+    use base64::{Engine as _, engine::general_purpose};
+
+    let encoded = general_purpose::STANDARD.encode(text.as_bytes());
+    print!("\x1b]52;c;{}\x07", encoded);
+    // Flush to ensure the sequence is sent immediately
+    io::stdout().flush().unwrap();
+}
 
 #[derive(Clone)]
 pub struct ContactLink<'a> {
@@ -22,10 +31,14 @@ pub struct ContactLink<'a> {
 }
 
 pub struct About<'a> {
+    state: usize,
+    current_link: String,
     links: Vec<ContactLink<'a>>,
     all_frames: Vec<Vec<Vec<[u8; 3]>>>,
     max_frames: usize,
     tick: u64,
+    show_tooltip: bool,
+    tooltip_end_tick: u64,
 }
 
 impl<'a> Page for About<'a> {
@@ -33,7 +46,20 @@ impl<'a> Page for About<'a> {
         "about"
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect, _is_focused: bool) {
+    fn render(&self, frame: &mut Frame, area: Rect, is_focused: bool) {
+        // Split area into tooltip area and content area
+        let [tooltip_area, content_area] =
+            Layout::vertical([Constraint::Length(1), Constraint::Min(0)]).areas(area);
+
+        // Render tooltip if active
+        if self.show_tooltip {
+            let tooltip_text = "✔ contact link copied to clipboard";
+            let tooltip_paragraph = Paragraph::new(tooltip_text)
+                .style(ratatui::style::Style::new().fg(ratatui::style::Color::Green))
+                .alignment(ratatui::layout::Alignment::Center);
+            frame.render_widget(tooltip_paragraph, tooltip_area);
+        }
+
         let line_1 = line_from_spans(vec![
             gray_span("hey! my name is "),
             white_span("kieran llarena"),
@@ -76,11 +102,29 @@ impl<'a> Page for About<'a> {
         let mut links: Vec<Line<'_>> = (0..(self.links.len()))
             .map(|index| {
                 let current_contact_link = &self.links[index];
-                Line::from(vec![
-                    gray_span(current_contact_link.display_text),
-                    gray_span(" - "),
-                    gray_span(current_contact_link.link),
-                ])
+                let is_selected = index == self.state;
+
+                if is_selected {
+                    if is_focused {
+                        Line::from(vec![
+                            link_span(current_contact_link.display_text),
+                            white_span(" - "),
+                            link_span(current_contact_link.link),
+                        ])
+                    } else {
+                        Line::from(vec![
+                            Span::styled(current_contact_link.display_text, dimmed_link_style()),
+                            white_span(" - "),
+                            Span::styled(current_contact_link.link, dimmed_link_style()),
+                        ])
+                    }
+                } else {
+                    Line::from(vec![
+                        gray_span(current_contact_link.display_text),
+                        gray_span(" - "),
+                        gray_span(current_contact_link.link),
+                    ])
+                }
             })
             .collect();
 
@@ -111,7 +155,7 @@ impl<'a> Page for About<'a> {
             }))
             .wrap(Wrap { trim: true });
 
-        frame.render_widget(paragraph, area);
+        frame.render_widget(paragraph, content_area);
     }
 
     fn render_additional(&self, frame: &mut Frame, area: Rect, _is_focused: bool) {
@@ -148,15 +192,51 @@ impl<'a> Page for About<'a> {
         frame.render_widget(canvas, area);
     }
 
-    fn keyboard_event_handler(&mut self, _key_code: KeyCode) {}
+    fn keyboard_event_handler(&mut self, key_code: KeyCode) {
+        match key_code {
+            KeyCode::Up => {
+                if self.state > 0 {
+                    self.state -= 1;
+                }
+                self.update_current_link();
+            }
+            KeyCode::Down => {
+                if self.state < self.links.len() - 1 {
+                    self.state += 1;
+                }
+                self.update_current_link();
+            }
+            KeyCode::Enter => {
+                if !self.current_link.is_empty() {
+                    osc52(&self.current_link);
+                    self.show_tooltip = true;
+                    self.tooltip_end_tick = self.tick + 38;
+                }
+            }
+            _ => {}
+        }
+    }
+
+    fn nav_items(&self) -> Vec<Line<'static>> {
+        vec![line_from_spans(vec![white_span(" ↵  "), gray_span("copy")])]
+    }
 
     fn on_tick(&mut self, tick: u64) -> bool {
         self.tick = tick;
+        if self.show_tooltip && tick >= self.tooltip_end_tick {
+            self.show_tooltip = false;
+        }
         true
     }
 }
 
 impl<'a> About<'a> {
+    fn update_current_link(&mut self) {
+        if let Some(selected_link) = self.links.get(self.state) {
+            self.current_link = selected_link.link.to_string();
+        }
+    }
+
     pub fn new() -> Self {
         let links: Vec<ContactLink> = vec![
             ContactLink {
@@ -180,11 +260,20 @@ impl<'a> About<'a> {
         let all_frames = get_all_frames_rgb_vals();
         let max_frames = all_frames.len();
 
+        let initial_link = links
+            .first()
+            .map(|link| link.link.to_string())
+            .unwrap_or_default();
+
         Self {
+            state: 0,
+            current_link: initial_link,
             links,
             all_frames,
             max_frames,
             tick: 0,
+            show_tooltip: false,
+            tooltip_end_tick: 0,
         }
     }
 }
