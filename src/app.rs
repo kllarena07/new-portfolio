@@ -11,8 +11,14 @@ use std::io;
 
 use crate::pages::{
     page::Page,
-    style::{GRAY, gray_span, white_span, white_span_owned},
+    style::{GRAY, dimmed_white_span_owned, gray_span, white_span, white_span_owned},
 };
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum FocusMode {
+    PageFocus,
+    ContentFocus,
+}
 
 pub struct App {
     pub running: bool,
@@ -24,6 +30,7 @@ pub struct App {
     pub show_menu: bool,
     pub show_aa1: bool,
     pub show_additional: bool,
+    pub focus_mode: FocusMode,
 }
 
 impl App {
@@ -53,6 +60,7 @@ impl App {
             show_menu,
             show_aa1,
             show_additional,
+            focus_mode: FocusMode::PageFocus,
         }
     }
 
@@ -159,11 +167,12 @@ impl App {
         let nav_widget = self.build_nav_widget();
         frame.render_widget(nav_widget, below_menu_area);
 
+        let content_focused = self.focus_mode == FocusMode::ContentFocus;
         if let Some(current_page) = self.pages.get(self.selected_page) {
-            current_page.render(frame, center_area);
+            current_page.render(frame, center_area, content_focused);
             match self.selected_page == 0 {
-                true => current_page.render_additional(frame, canvas_area),
-                false => current_page.render_additional(frame, additional_area),
+                true => current_page.render_additional(frame, canvas_area, content_focused),
+                false => current_page.render_additional(frame, additional_area, content_focused),
             }
         }
     }
@@ -172,13 +181,38 @@ impl App {
         match key_event {
             KeyCode::Char('q') => {
                 self.running = false;
-                return Err(io::Error::new(io::ErrorKind::ConnectionAborted, "Quit requested"));
+                return Err(io::Error::new(
+                    io::ErrorKind::ConnectionAborted,
+                    "Quit requested",
+                ));
             }
-            KeyCode::Up => self.previous_page(),
-            KeyCode::Down => self.next_page(),
+            KeyCode::Left | KeyCode::Char('h') => {
+                self.focus_mode = FocusMode::PageFocus;
+            }
+            KeyCode::Right | KeyCode::Char('l') => {
+                self.focus_mode = FocusMode::ContentFocus;
+            }
+            KeyCode::Up | KeyCode::Char('k') => match self.focus_mode {
+                FocusMode::PageFocus => self.previous_page(),
+                FocusMode::ContentFocus => {
+                    if let Some(current_page) = self.pages.get_mut(self.selected_page) {
+                        current_page.keyboard_event_handler(KeyCode::Up);
+                    }
+                }
+            },
+            KeyCode::Down | KeyCode::Char('j') => match self.focus_mode {
+                FocusMode::PageFocus => self.next_page(),
+                FocusMode::ContentFocus => {
+                    if let Some(current_page) = self.pages.get_mut(self.selected_page) {
+                        current_page.keyboard_event_handler(KeyCode::Down);
+                    }
+                }
+            },
             _ => {
-                if let Some(current_page) = self.pages.get_mut(self.selected_page) {
-                    current_page.keyboard_event_handler(key_event);
+                if self.focus_mode == FocusMode::ContentFocus {
+                    if let Some(current_page) = self.pages.get_mut(self.selected_page) {
+                        current_page.keyboard_event_handler(key_event);
+                    }
                 }
             }
         }
@@ -208,9 +242,15 @@ impl App {
         let menu_items: Vec<ListItem> = (0..self.pages.len())
             .map(move |index| {
                 let title = self.pages[index].title();
+                let is_selected = index == self.selected_page;
+                let page_focused = self.focus_mode == FocusMode::PageFocus;
 
-                let span = if index == self.selected_page {
-                    white_span_owned(format!("[ {} ]", title))
+                let span = if is_selected {
+                    if page_focused {
+                        white_span_owned(format!("[ {} ]", title))
+                    } else {
+                        dimmed_white_span_owned(format!("[ {} ]", title))
+                    }
                 } else {
                     gray_span(&title)
                 };
@@ -236,10 +276,15 @@ impl App {
     }
 
     fn build_nav_widget(&self) -> List<'_> {
-        let mut nav_lines: Vec<ListItem> = vec![ListItem::new(Line::from(vec![
-            white_span("↑/↓ "),
-            gray_span("page"),
-        ]))];
+        let focus_text = match self.focus_mode {
+            FocusMode::PageFocus => "page",
+            FocusMode::ContentFocus => "content",
+        };
+
+        let mut nav_lines: Vec<ListItem> = vec![
+            ListItem::new(Line::from(vec![white_span("↑/↓ "), gray_span(focus_text)])),
+            ListItem::new(Line::from(vec![white_span("←/→ "), gray_span("focus")])),
+        ];
 
         if let Some(current_page) = self.pages.get(self.selected_page) {
             let page_nav_items = current_page.nav_items();

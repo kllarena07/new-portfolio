@@ -30,7 +30,9 @@ use crate::pages::{
         websocket::WebSocket,
     },
     page::Page,
-    style::{gray_span, gray_style, line_from_spans, selected_style, white_span},
+    style::{
+        dimmed_selected_style, gray_span, gray_style, line_from_spans, selected_style, white_span,
+    },
 };
 
 fn osc52(text: &str) {
@@ -71,7 +73,7 @@ impl Page for Projects {
         "projects"
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect) {
+    fn render(&self, frame: &mut Frame, area: Rect, is_focused: bool) {
         // Split area into tooltip area and content area
         let [tooltip_area, content_area] =
             Layout::vertical([Constraint::Length(1), Constraint::Min(0)]).areas(area);
@@ -95,7 +97,13 @@ impl Page for Projects {
             let item = data.ref_name();
 
             let style_config = match i == self.state {
-                true => selected_style(),
+                true => {
+                    if is_focused {
+                        selected_style()
+                    } else {
+                        dimmed_selected_style()
+                    }
+                }
                 false => gray_style(),
             };
 
@@ -132,7 +140,7 @@ impl Page for Projects {
         frame.render_widget(table, content_area);
     }
 
-    fn render_additional(&self, frame: &mut Frame, area: Rect) {
+    fn render_additional(&self, frame: &mut Frame, area: Rect, is_focused: bool) {
         let mut description = self.get_description();
         description.insert(0, line_from_spans(vec![white_span("desc")]));
 
@@ -163,10 +171,10 @@ impl Page for Projects {
 
     fn keyboard_event_handler(&mut self, key_code: KeyCode) {
         match key_code {
-            KeyCode::Char('k') => {
+            KeyCode::Char('k') | KeyCode::Up => {
                 self.previous_project();
             }
-            KeyCode::Char('j') => {
+            KeyCode::Char('j') | KeyCode::Down => {
                 self.next_project();
             }
             KeyCode::Enter => {
@@ -179,10 +187,7 @@ impl Page for Projects {
     }
 
     fn nav_items(&self) -> Vec<Line<'static>> {
-        vec![
-            line_from_spans(vec![white_span("j/k "), gray_span("row")]),
-            line_from_spans(vec![white_span(" ↵  "), gray_span("copy")]),
-        ]
+        vec![line_from_spans(vec![white_span(" ↵  "), gray_span("copy")])]
     }
 
     fn on_tick(&mut self, tick: u64) -> bool {

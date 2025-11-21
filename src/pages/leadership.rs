@@ -8,7 +8,9 @@ use ratatui::{
 };
 
 use crate::pages::page::Page;
-use crate::pages::style::{gray_span, gray_style, line_from_spans, selected_style, white_span};
+use crate::pages::style::{
+    dimmed_selected_style, gray_span, gray_style, line_from_spans, selected_style, white_span,
+};
 
 struct ExperienceItem {
     role: &'static str,
@@ -92,7 +94,7 @@ impl Page for Leadership {
         "leadership"
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect) {
+    fn render(&self, frame: &mut Frame, area: Rect, is_focused: bool) {
         let header = ["role", "affiliation", "time"]
             .into_iter()
             .map(Cell::from)
@@ -103,7 +105,13 @@ impl Page for Leadership {
             let item = data.ref_array();
 
             let style_config = match i == self.state {
-                true => selected_style(),
+                true => {
+                    if is_focused {
+                        selected_style()
+                    } else {
+                        dimmed_selected_style()
+                    }
+                }
                 false => gray_style(),
             };
 
@@ -133,7 +141,7 @@ impl Page for Leadership {
         frame.render_widget(table, area);
     }
 
-    fn render_additional(&self, frame: &mut Frame, area: Rect) {
+    fn render_additional(&self, frame: &mut Frame, area: Rect, is_focused: bool) {
         let mut description = self.get_description();
         description.insert(0, line_from_spans(vec![white_span("desc")]));
 
@@ -143,17 +151,13 @@ impl Page for Leadership {
 
     fn keyboard_event_handler(&mut self, key_code: KeyCode) {
         match key_code {
-            KeyCode::Char('k') => {
+            KeyCode::Char('k') | KeyCode::Up => {
                 self.previous_experience();
             }
-            KeyCode::Char('j') => {
+            KeyCode::Char('j') | KeyCode::Down => {
                 self.next_experience();
             }
             _ => {}
         }
-    }
-
-    fn nav_items(&self) -> Vec<Line<'static>> {
-        vec![line_from_spans(vec![white_span("j/k "), gray_span("row")])]
     }
 }
