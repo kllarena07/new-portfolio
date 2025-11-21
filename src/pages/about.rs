@@ -33,7 +33,7 @@ impl<'a> Page for About<'a> {
         "about"
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect, is_focused: bool) {
+    fn render(&self, frame: &mut Frame, area: Rect, _is_focused: bool) {
         let line_1 = line_from_spans(vec![
             gray_span("hey! my name is "),
             white_span("kieran llarena"),
@@ -114,7 +114,7 @@ impl<'a> Page for About<'a> {
         frame.render_widget(paragraph, area);
     }
 
-    fn render_additional(&self, frame: &mut Frame, area: Rect, is_focused: bool) {
+    fn render_additional(&self, frame: &mut Frame, area: Rect, _is_focused: bool) {
         if self.max_frames == 0 || self.all_frames.is_empty() {
             return;
         }

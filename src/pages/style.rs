@@ -25,9 +25,7 @@ pub fn dimmed_selected_style() -> Style {
     Style::new().fg(BLACK).bg(DIMMED_WHITE_BG)
 }
 
-pub fn dimmed_gray_style() -> Style {
-    Style::default().fg(DIMMED_WHITE_BG)
-}
+
 
 pub fn dimmed_white_style() -> Style {
     Style::default().fg(DIMMED_WHITE)

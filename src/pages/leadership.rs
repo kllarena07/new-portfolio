@@ -141,7 +141,7 @@ impl Page for Leadership {
         frame.render_widget(table, area);
     }
 
-    fn render_additional(&self, frame: &mut Frame, area: Rect, is_focused: bool) {
+    fn render_additional(&self, frame: &mut Frame, area: Rect, _is_focused: bool) {
         let mut description = self.get_description();
         description.insert(0, line_from_spans(vec![white_span("desc")]));
 
