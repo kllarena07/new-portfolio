@@ -38,7 +38,7 @@ impl Leadership {
                 affiliation: "filipino americans in tech",
                 time: "(oct 2024-present)",
                 description: vec![
-                    "building the largest network of filipino tech professionals to help make tech more accessible for filipinos. currently at 263 members",
+                    "building a community of filipino tech professionals to help make tech more accessible for filipinos. currently at 268 members",
                     "",
                     "notable highlights:",
                     "- collaborated amazon, dreamhaven, and aapi in gaming",
@@ -53,7 +53,7 @@ impl Leadership {
                     "built a 6,000+ member hackathon community",
                     "",
                     "notable highlights:",
-                    "- secured $2k in sponsorship backing from companies like koyeb and tensordock",
+                    "- secured $2k in sponsorship backing from koyeb and tensordock",
                 ],
             },
         ];
