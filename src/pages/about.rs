@@ -47,11 +47,9 @@ impl<'a> Page for About<'a> {
     }
 
     fn render(&self, frame: &mut Frame, area: Rect, is_focused: bool) {
-        // Split area into tooltip area and content area
         let [tooltip_area, content_area] =
             Layout::vertical([Constraint::Length(1), Constraint::Min(0)]).areas(area);
 
-        // Render tooltip if active
         if self.show_tooltip {
             let tooltip_text = "✔ contact link copied to clipboard";
             let tooltip_paragraph = Paragraph::new(tooltip_text)

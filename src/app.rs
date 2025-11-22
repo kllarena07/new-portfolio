@@ -95,7 +95,7 @@ impl App {
             .map(|page| format!("[ {} ]", page.title()).len())
             .max()
             .unwrap_or(0) as u16
-            + 3; // +3 for right padding
+            + 3; // +3 for right padding. Magic number
 
         let [left_area, center_area, right_area] = Layout::horizontal([
             Constraint::Fill(1),

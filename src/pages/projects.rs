@@ -144,26 +144,21 @@ impl Page for Projects {
         let mut description = self.get_description();
         description.insert(0, line_from_spans(vec![white_span("desc")]));
 
-        // Create the paragraph with wrapping
         let paragraph = Paragraph::new(description).wrap(Wrap { trim: true });
 
-        // Calculate the actual height needed using line_count
-        let text_height = paragraph.line_count(area.width);
+        let text_height = paragraph.line_count(area.width); // NOTE: this feature is experimental and potentially unstable
         let available_height = area.height;
 
         // Ensure we don't exceed available height and reserve space for tech block
         let actual_text_height = (text_height as u16).min(available_height.saturating_sub(4));
 
-        // Split the area: text area + tech block area
         let [text_area, tech_area] =
             Layout::vertical([Constraint::Length(actual_text_height), Constraint::Fill(1)])
                 .spacing(1)
                 .areas(area);
 
-        // Render the description paragraph
         frame.render_widget(paragraph, text_area);
 
-        // Create and render label container with technologies from current project
         let project_item = &self.projects[self.state];
         let container = LabelContainer::new(&project_item.technologies);
         container.render(frame, tech_area);
