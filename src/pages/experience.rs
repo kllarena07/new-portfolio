@@ -112,6 +112,21 @@ impl Experience {
                 technologies: vec![Expo::build(), TypeScript::build(), Supabase::build()],
             },
             ExperienceItem {
+                role: "mobile app dev",
+                affiliation: "hackdearborn 3",
+                time: "(jun 2024-oct 2024)",
+                description: vec![
+                    "worked on the event management mobile app for hackdearborn 3; collaborated on a team of 16",
+                    "",
+                    "features include qr code check-ins and a live agenda, message feed, and push notifications to keep attendees updated",
+                    "",
+                    "notable highlights:",
+                    "- deployed to the ios app store as 'hack dearborn'",
+                    "- supported 350+ participants",
+                ],
+                technologies: vec![Expo::build(), TypeScript::build(), Supabase::build()],
+            },
+            ExperienceItem {
                 role: "frontend dev",
                 affiliation: "gdsc @ um-dearborn",
                 time: "(nov 2023-dec 2023)",
