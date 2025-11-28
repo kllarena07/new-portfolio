@@ -98,7 +98,7 @@ impl Experience {
             },
             ExperienceItem {
                 role: "mobile app dev",
-                affiliation: "swe, um-dearborn",
+                affiliation: "swe @ um-dearborn",
                 time: "(feb 2025-mar 2025)",
                 description: vec![
                     "solo developed an event management mobile app for the society of women engineers at the university of michigan-dearborn's power conference",
@@ -113,7 +113,7 @@ impl Experience {
             },
             ExperienceItem {
                 role: "frontend dev",
-                affiliation: "gdsc, um-dearborn",
+                affiliation: "gdsc @ um-dearborn",
                 time: "(nov 2023-dec 2023)",
                 description: vec![
                     "built the michigan devfest 2023 website on a team of 8",
